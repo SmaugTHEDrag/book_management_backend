@@ -14,9 +14,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class JwtUtils {
-    private static final long EXPIRE_TIME = 24 * 60 * 60 * 1000L;
+    private static final long EXPIRE_TIME = 30 * 24 * 60 * 60 * 1000L;
 
-    // ✅ Key dài ít nhất 64 ký tự (≥ 512 bits) - bạn có thể thay key này nếu cần
+    // Key dài ít nhất 64 ký tự (≥ 512 bits) - bạn có thể thay key này nếu cần
     private static final String SECRET = "ThisIsASecretKeyForJwtThatIsAtLeastSixtyFourCharactersLong123456!";
     private static final SecretKey SECRET_KEY = Keys.hmacShaKeyFor(SECRET.getBytes());
 

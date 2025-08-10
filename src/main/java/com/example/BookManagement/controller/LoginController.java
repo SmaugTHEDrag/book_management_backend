@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,15 +22,26 @@ public class LoginController {
     private AuthenticationManager authenticationManager;
 
     @PostMapping
-    public ResponseEntity<Object> login(@RequestBody LoginForm loginForm){
+    public ResponseEntity<Object> login(@RequestBody LoginForm loginForm) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginForm.getLogin(), loginForm.getPassword())
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = JwtUtils.generateJwt(authentication);
+
+        String username = authentication.getName();
+        String role = authentication.getAuthorities().stream()
+                .findFirst()
+                .map(GrantedAuthority::getAuthority)
+                .orElse(null);
+
         LoginResponse loginResponse = new LoginResponse();
         loginResponse.setToken(jwt);
+        loginResponse.setLogin(username);
+        loginResponse.setRole(role);
+
         return ResponseEntity.ok(loginResponse);
     }
+
 
 }

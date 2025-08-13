@@ -4,13 +4,14 @@ import com.example.BookManagement.dto.UpdateRoleDTO;
 import com.example.BookManagement.dto.UserDTO;
 import com.example.BookManagement.dto.UserRequestDTO;
 import com.example.BookManagement.entity.User;
+import com.example.BookManagement.form.RegisterForm;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.List;
 
-public interface IUserService extends UserDetailsService {
+public interface IUserService  {
     List<User> getAllUsers();
 
     User getUserById(int id);
@@ -23,7 +24,5 @@ public interface IUserService extends UserDetailsService {
 
     void updateUserRole(int id, UpdateRoleDTO updateRoleDTO);
 
-    UserDTO register(UserRequestDTO userRequestDTO);
 
-    UserDetails loadUserByUsername(String username) throws UsernameNotFoundException;
 }

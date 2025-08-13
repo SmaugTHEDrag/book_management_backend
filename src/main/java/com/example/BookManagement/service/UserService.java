@@ -6,6 +6,7 @@ import com.example.BookManagement.dto.UserRequestDTO;
 import com.example.BookManagement.entity.Role;
 import com.example.BookManagement.entity.User;
 import com.example.BookManagement.exception.ResourceNotFoundException;
+import com.example.BookManagement.form.RegisterForm;
 import com.example.BookManagement.repository.IUserRepository;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
@@ -27,9 +28,6 @@ public class UserService implements IUserService{
 
     @Autowired
     private ModelMapper modelMapper;
-
-    @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
 
     @Override
     public List<User> getAllUsers() {
@@ -80,31 +78,4 @@ public class UserService implements IUserService{
         userRepository.save(user);
     }
 
-    @Override
-    public UserDTO register(UserRequestDTO userRequestDTO) {
-        if (userRepository.existsByUsername(userRequestDTO.getUsername())){
-            throw new RuntimeException("Username already exists");
-        }
-        if (userRepository.existsByEmail(userRequestDTO.getEmail())){
-            throw new RuntimeException("Username already exists");
-        }
-        User user = modelMapper.map(userRequestDTO, User.class);
-        user.setPassword(passwordEncoder.encode(userRequestDTO.getPassword()));
-        user.setRole(userRequestDTO.getRole() != null ? Role.valueOf(userRequestDTO.getRole().toUpperCase()) : Role.CUSTOMER);
-        User savedUser = userRepository.save(user);
-        return modelMapper.map(savedUser, UserDTO.class);
-    }
-
-    @Override
-    public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
-        User user = login.contains("@")
-                ? userRepository.findByEmail(login).orElseThrow(() -> new UsernameNotFoundException("Email not found"))
-                : userRepository.findByUsername(login).orElseThrow(() -> new UsernameNotFoundException("Username not found"));
-
-        return new org.springframework.security.core.userdetails.User(
-                user.getUsername(),
-                user.getPassword(),
-                AuthorityUtils.createAuthorityList(user.getRole().toString())
-        );
-    }
 }

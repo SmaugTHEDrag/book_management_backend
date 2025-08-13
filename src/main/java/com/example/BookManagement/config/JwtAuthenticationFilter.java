@@ -1,5 +1,6 @@
 package com.example.BookManagement.config;
 
+import com.example.BookManagement.service.IAuthService;
 import com.example.BookManagement.service.IUserService;
 import com.example.BookManagement.utils.JwtUtils;
 import jakarta.servlet.FilterChain;
@@ -18,7 +19,7 @@ import java.io.IOException;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
-    private IUserService userService;
+    private IAuthService userService;
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException, ServletException {
         String jwt = getJwtFromHeader(request);

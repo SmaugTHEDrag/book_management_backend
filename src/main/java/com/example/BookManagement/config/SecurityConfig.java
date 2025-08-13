@@ -1,5 +1,6 @@
 package com.example.BookManagement.config;
 
+import com.example.BookManagement.service.IAuthService;
 import com.example.BookManagement.service.IUserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,10 +22,10 @@ import java.util.List;
 
 @Configuration
 public class SecurityConfig {
-    private final IUserService userService;
+    private final IAuthService userService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    public SecurityConfig(IUserService userService, JwtAuthenticationFilter jwtAuthenticationFilter) {
+    public SecurityConfig(IAuthService userService, JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.userService = userService;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }

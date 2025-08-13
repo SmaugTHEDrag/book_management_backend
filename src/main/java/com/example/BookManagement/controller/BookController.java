@@ -3,6 +3,7 @@ package com.example.BookManagement.controller;
 import com.example.BookManagement.dto.BookDTO;
 import com.example.BookManagement.dto.BookRequestDTO;
 import com.example.BookManagement.entity.Book;
+import com.example.BookManagement.form.BookFilterForm;
 import com.example.BookManagement.service.IBookService;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
@@ -25,8 +26,8 @@ public class BookController {
     private ModelMapper modelMapper;
 
     @GetMapping
-    public ResponseEntity<List<BookDTO>> getAllBooks(){
-        List<Book> books = bookService.getAllBooks();
+    public ResponseEntity<List<BookDTO>> getAllBooks(BookFilterForm form){
+        List<Book> books = bookService.getAllBooks(form);
         return ResponseEntity.ok(modelMapper.map(books, new TypeToken<List<BookDTO>>(){}.getType()));
     }
 

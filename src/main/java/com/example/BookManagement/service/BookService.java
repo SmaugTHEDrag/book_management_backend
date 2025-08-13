@@ -4,9 +4,13 @@ import com.example.BookManagement.dto.BookDTO;
 import com.example.BookManagement.dto.BookRequestDTO;
 import com.example.BookManagement.entity.Book;
 import com.example.BookManagement.exception.ResourceNotFoundException;
+import com.example.BookManagement.form.BookFilterForm;
 import com.example.BookManagement.repository.IBookRepository;
+import com.example.BookManagement.specification.BookSpecification;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,8 +24,9 @@ public class BookService implements IBookService {
     private ModelMapper modelMapper;
 
     @Override
-    public List<Book> getAllBooks() {
-        return bookRepository.findAll();
+    public List<Book> getAllBooks(BookFilterForm form) {
+        Specification<Book> where = BookSpecification.buildWhere(form);
+        return bookRepository.findAll(where);
     }
 
     @Override

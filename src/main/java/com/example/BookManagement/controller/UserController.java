@@ -4,6 +4,7 @@ import com.example.BookManagement.dto.UpdateRoleDTO;
 import com.example.BookManagement.dto.UserDTO;
 import com.example.BookManagement.dto.UserRequestDTO;
 import com.example.BookManagement.entity.User;
+import com.example.BookManagement.form.UserFilterForm;
 import com.example.BookManagement.service.IUserService;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
@@ -28,8 +29,8 @@ public class UserController
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
-    public ResponseEntity<List<UserDTO>> getAllUsers(){
-        List<User> users = userService.getAllUsers();
+    public ResponseEntity<List<UserDTO>> getAllUsers(UserFilterForm form){
+        List<User> users = userService.getAllUsers(form);
         return ResponseEntity.ok(modelMapper.map(users, new TypeToken<List<UserDTO>>(){}.getType()));
     }
 

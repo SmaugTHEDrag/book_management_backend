@@ -7,10 +7,13 @@ import com.example.BookManagement.entity.Role;
 import com.example.BookManagement.entity.User;
 import com.example.BookManagement.exception.ResourceNotFoundException;
 import com.example.BookManagement.form.RegisterForm;
+import com.example.BookManagement.form.UserFilterForm;
 import com.example.BookManagement.repository.IUserRepository;
+import com.example.BookManagement.specification.UserSpecification;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -30,8 +33,9 @@ public class UserService implements IUserService{
     private ModelMapper modelMapper;
 
     @Override
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public List<User> getAllUsers(UserFilterForm form) {
+        Specification<User> where = UserSpecification.buildWhere(form);
+        return userRepository.findAll(where);
     }
 
     @Override

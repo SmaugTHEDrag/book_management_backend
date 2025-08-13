@@ -2,6 +2,7 @@ package com.example.BookManagement.controller;
 
 import com.example.BookManagement.dto.UpdateRoleDTO;
 import com.example.BookManagement.dto.UserDTO;
+import com.example.BookManagement.dto.UserPageResponse;
 import com.example.BookManagement.dto.UserRequestDTO;
 import com.example.BookManagement.entity.User;
 import com.example.BookManagement.form.UserFilterForm;
@@ -10,6 +11,9 @@ import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -29,9 +33,8 @@ public class UserController
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
-    public ResponseEntity<List<UserDTO>> getAllUsers(UserFilterForm form){
-        List<User> users = userService.getAllUsers(form);
-        return ResponseEntity.ok(modelMapper.map(users, new TypeToken<List<UserDTO>>(){}.getType()));
+    public ResponseEntity<UserPageResponse> getAllUsers(UserFilterForm form, @PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable pageable){
+        return ResponseEntity.ok(userService.getAllUsers(form, pageable));
     }
 
     @GetMapping("{id}")

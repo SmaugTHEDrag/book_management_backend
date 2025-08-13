@@ -1,6 +1,7 @@
 package com.example.BookManagement.service;
 
 import com.example.BookManagement.dto.BookDTO;
+import com.example.BookManagement.dto.BookPageResponse;
 import com.example.BookManagement.dto.BookRequestDTO;
 import com.example.BookManagement.entity.Book;
 import com.example.BookManagement.exception.ResourceNotFoundException;
@@ -9,11 +10,15 @@ import com.example.BookManagement.repository.IBookRepository;
 import com.example.BookManagement.specification.BookSpecification;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class BookService implements IBookService {
@@ -24,9 +29,21 @@ public class BookService implements IBookService {
     private ModelMapper modelMapper;
 
     @Override
-    public List<Book> getAllBooks(BookFilterForm form) {
+    public BookPageResponse getAllBooks(BookFilterForm form, Pageable pageable) {
         Specification<Book> where = BookSpecification.buildWhere(form);
-        return bookRepository.findAll(where);
+        Page<Book> books = bookRepository.findAll(where, pageable);
+        Page<BookDTO> bookDTOs = books.map(book -> modelMapper.map(book, BookDTO.class));
+
+        // Build response
+        return new BookPageResponse(
+            bookDTOs.getContent(),
+            bookDTOs.getNumber(),
+            bookDTOs.getTotalElements(),
+            bookDTOs.getTotalPages(),
+            bookDTOs.getSize(),
+            bookDTOs.isLast(),
+            bookDTOs.isFirst()
+        );
     }
 
     @Override
@@ -61,6 +78,5 @@ public class BookService implements IBookService {
     public void deleteBook(int id) {
         bookRepository.deleteById(id);
     }
-
 
 }

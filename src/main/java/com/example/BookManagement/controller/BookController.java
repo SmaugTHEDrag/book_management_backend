@@ -1,6 +1,7 @@
 package com.example.BookManagement.controller;
 
 import com.example.BookManagement.dto.BookDTO;
+import com.example.BookManagement.dto.BookPageResponse;
 import com.example.BookManagement.dto.BookRequestDTO;
 import com.example.BookManagement.entity.Book;
 import com.example.BookManagement.form.BookFilterForm;
@@ -9,12 +10,18 @@ import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("api/books")
@@ -26,9 +33,8 @@ public class BookController {
     private ModelMapper modelMapper;
 
     @GetMapping
-    public ResponseEntity<List<BookDTO>> getAllBooks(BookFilterForm form){
-        List<Book> books = bookService.getAllBooks(form);
-        return ResponseEntity.ok(modelMapper.map(books, new TypeToken<List<BookDTO>>(){}.getType()));
+    public ResponseEntity<BookPageResponse> getAllBooks(BookFilterForm form, @PageableDefault(page = 0, size = 9, sort = "id", direction = Sort.Direction.ASC) Pageable pageable){
+        return ResponseEntity.ok(bookService.getAllBooks(form,pageable));
     }
 
     @GetMapping("{id}")

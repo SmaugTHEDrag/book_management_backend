@@ -2,6 +2,7 @@ package com.example.BookManagement.service;
 
 import com.example.BookManagement.dto.UpdateRoleDTO;
 import com.example.BookManagement.dto.UserDTO;
+import com.example.BookManagement.dto.UserPageResponse;
 import com.example.BookManagement.dto.UserRequestDTO;
 import com.example.BookManagement.entity.Role;
 import com.example.BookManagement.entity.User;
@@ -13,8 +14,11 @@ import com.example.BookManagement.specification.UserSpecification;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -33,9 +37,21 @@ public class UserService implements IUserService{
     private ModelMapper modelMapper;
 
     @Override
-    public List<User> getAllUsers(UserFilterForm form) {
+    public UserPageResponse getAllUsers(UserFilterForm form, Pageable pageable) {
         Specification<User> where = UserSpecification.buildWhere(form);
-        return userRepository.findAll(where);
+        Page<User> users = userRepository.findAll(where,pageable);
+        Page<UserDTO> userDTOS = users.map(user -> modelMapper.map(user, UserDTO.class));
+
+        //Build response
+        return new UserPageResponse(
+                userDTOS.getContent(),
+                userDTOS.getNumber(),
+                userDTOS.getTotalElements(),
+                userDTOS.getTotalPages(),
+                userDTOS.getSize(),
+                userDTOS.isLast(),
+                userDTOS.isFirst()
+        );
     }
 
     @Override

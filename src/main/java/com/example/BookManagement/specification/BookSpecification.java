@@ -14,15 +14,32 @@ public class BookSpecification {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            // Search for title
-            if(form.getTitleSearch() != null && !form.getTitleSearch().isEmpty()){
-                String value = "%" + form.getTitleSearch().toLowerCase() + "%";
-                predicates.add(criteriaBuilder.like(root.get("title"), value));
+            // Search chung (OR logic cho title và author)
+            if(form.getSearch() != null && !form.getSearch().isEmpty()){
+                String value = "%" + form.getSearch().toLowerCase() + "%";
+
+                Predicate titlePredicate = criteriaBuilder.like(
+                        criteriaBuilder.lower(root.get("title")), value);
+                Predicate authorPredicate = criteriaBuilder.like(
+                        criteriaBuilder.lower(root.get("author")), value);
+
+                // OR: tìm trong title HOẶC author
+                predicates.add(criteriaBuilder.or(titlePredicate, authorPredicate));
             }
-            // Search for author
-            if(form.getAuthorSearch() != null && !form.getAuthorSearch().isEmpty()){
-                String value = "%" + form.getAuthorSearch().toLowerCase() + "%";
-                predicates.add(criteriaBuilder.like(root.get("author"), value));
+            // Nếu không có search chung, mới dùng titleSearch và authorSearch riêng
+            else {
+                // Search for title
+                if(form.getTitleSearch() != null && !form.getTitleSearch().isEmpty()){
+                    String value = "%" + form.getTitleSearch().toLowerCase() + "%";
+                    predicates.add(criteriaBuilder.like(
+                            criteriaBuilder.lower(root.get("title")), value));
+                }
+                // Search for author
+                if(form.getAuthorSearch() != null && !form.getAuthorSearch().isEmpty()){
+                    String value = "%" + form.getAuthorSearch().toLowerCase() + "%";
+                    predicates.add(criteriaBuilder.like(
+                            criteriaBuilder.lower(root.get("author")), value));
+                }
             }
             // Search for category
             if(form.getCategorySearch() != null && !form.getCategorySearch().isEmpty()){

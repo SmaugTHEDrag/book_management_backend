@@ -25,7 +25,7 @@ public class FavoriteController {
         return ResponseEntity.ok(favoriteService.addFavorite(request, principal.getName()));
     }
 
-    @DeleteMapping("/{favoriteId}")
+    @DeleteMapping("/{bookId}")
     public ResponseEntity<?> removeFavorite(@PathVariable Integer bookId, Principal principal) {
         favoriteService.removeFavorite(bookId, principal.getName());
         return ResponseEntity.ok("Book removed from favorites");

@@ -12,4 +12,6 @@ public class BookFilterForm {
     private String categorySearch;
     private Integer minId;
     private Integer maxId;
+
+    private String search;
 }

@@ -1,4 +1,4 @@
-package com.example.BookManagement.dto;
+package com.example.BookManagement.dto.book;
 
 import lombok.Data;
 

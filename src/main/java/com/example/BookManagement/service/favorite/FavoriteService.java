@@ -1,7 +1,7 @@
-package com.example.BookManagement.service;
+package com.example.BookManagement.service.favorite;
 
-import com.example.BookManagement.dto.FavoriteDTO;
-import com.example.BookManagement.dto.FavoriteRequestDTO;
+import com.example.BookManagement.dto.favorite.FavoriteDTO;
+import com.example.BookManagement.dto.favorite.FavoriteRequestDTO;
 import com.example.BookManagement.entity.Book;
 import com.example.BookManagement.entity.Favorite;
 import com.example.BookManagement.entity.User;

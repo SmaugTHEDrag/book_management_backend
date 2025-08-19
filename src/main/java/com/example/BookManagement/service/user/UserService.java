@@ -1,13 +1,12 @@
-package com.example.BookManagement.service;
+package com.example.BookManagement.service.user;
 
-import com.example.BookManagement.dto.UpdateRoleDTO;
-import com.example.BookManagement.dto.UserDTO;
-import com.example.BookManagement.dto.UserPageResponse;
-import com.example.BookManagement.dto.UserRequestDTO;
+import com.example.BookManagement.dto.user.UpdateRoleDTO;
+import com.example.BookManagement.dto.user.UserDTO;
+import com.example.BookManagement.dto.user.UserPageResponse;
+import com.example.BookManagement.dto.user.UserRequestDTO;
 import com.example.BookManagement.entity.Role;
 import com.example.BookManagement.entity.User;
 import com.example.BookManagement.exception.ResourceNotFoundException;
-import com.example.BookManagement.form.RegisterForm;
 import com.example.BookManagement.form.UserFilterForm;
 import com.example.BookManagement.repository.IUserRepository;
 import com.example.BookManagement.specification.UserSpecification;
@@ -17,14 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.parameters.P;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service

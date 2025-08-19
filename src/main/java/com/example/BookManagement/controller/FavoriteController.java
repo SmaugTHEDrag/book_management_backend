@@ -1,13 +1,10 @@
 package com.example.BookManagement.controller;
 
-import com.example.BookManagement.dto.FavoriteDTO;
-import com.example.BookManagement.dto.FavoriteRequestDTO;
-import com.example.BookManagement.entity.User;
-import com.example.BookManagement.service.IFavoriteService;
-import jakarta.validation.Valid;
+import com.example.BookManagement.dto.favorite.FavoriteDTO;
+import com.example.BookManagement.dto.favorite.FavoriteRequestDTO;
+import com.example.BookManagement.service.favorite.IFavoriteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;

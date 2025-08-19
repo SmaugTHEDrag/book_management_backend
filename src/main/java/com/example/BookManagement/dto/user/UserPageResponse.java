@@ -1,4 +1,4 @@
-package com.example.BookManagement.dto;
+package com.example.BookManagement.dto.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,8 +9,8 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class BookPageResponse {
-    private List<BookDTO> content;
+public class UserPageResponse {
+    private List<UserDTO> content;
     private int currentPage;
     private long totalItems;
     private int totalPages;

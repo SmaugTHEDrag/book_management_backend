@@ -1,11 +1,11 @@
-package com.example.BookManagement.dto;
+package com.example.BookManagement.dto.favorite;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class FavoriteDTO {
-    private Integer id;
-    private Integer userId;
+public class FavoriteRequestDTO {
+    @NotNull
     private Integer bookId;
     private String title;
     private String author;

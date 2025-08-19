@@ -1,10 +1,8 @@
 package com.example.BookManagement.controller;
 
-import com.example.BookManagement.dto.UserDTO;
-import com.example.BookManagement.dto.UserRequestDTO;
+import com.example.BookManagement.dto.user.UserDTO;
 import com.example.BookManagement.form.RegisterForm;
-import com.example.BookManagement.service.IAuthService;
-import com.example.BookManagement.service.IUserService;
+import com.example.BookManagement.service.auth.IAuthService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

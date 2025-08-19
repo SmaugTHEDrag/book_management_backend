@@ -1,7 +1,6 @@
 package com.example.BookManagement.config;
 
-import com.example.BookManagement.service.IAuthService;
-import com.example.BookManagement.service.IUserService;
+import com.example.BookManagement.service.auth.IAuthService;
 import com.example.BookManagement.utils.JwtUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

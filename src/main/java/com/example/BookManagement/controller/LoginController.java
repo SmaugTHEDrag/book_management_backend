@@ -1,6 +1,6 @@
 package com.example.BookManagement.controller;
 
-import com.example.BookManagement.dto.LoginResponse;
+import com.example.BookManagement.dto.auth.LoginResponse;
 import com.example.BookManagement.form.LoginForm;
 import com.example.BookManagement.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;

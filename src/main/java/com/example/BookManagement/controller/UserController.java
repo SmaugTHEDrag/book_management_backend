@@ -1,15 +1,14 @@
 package com.example.BookManagement.controller;
 
-import com.example.BookManagement.dto.UpdateRoleDTO;
-import com.example.BookManagement.dto.UserDTO;
-import com.example.BookManagement.dto.UserPageResponse;
-import com.example.BookManagement.dto.UserRequestDTO;
+import com.example.BookManagement.dto.user.UpdateRoleDTO;
+import com.example.BookManagement.dto.user.UserDTO;
+import com.example.BookManagement.dto.user.UserPageResponse;
+import com.example.BookManagement.dto.user.UserRequestDTO;
 import com.example.BookManagement.entity.User;
 import com.example.BookManagement.form.UserFilterForm;
-import com.example.BookManagement.service.IUserService;
+import com.example.BookManagement.service.user.IUserService;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -18,8 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("api/users")

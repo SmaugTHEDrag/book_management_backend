@@ -1,4 +1,4 @@
-package com.example.BookManagement.dto;
+package com.example.BookManagement.dto.auth;
 
 import lombok.Data;
 

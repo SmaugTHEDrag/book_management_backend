@@ -1,15 +1,12 @@
-package com.example.BookManagement.service;
+package com.example.BookManagement.service.user;
 
-import com.example.BookManagement.dto.*;
+import com.example.BookManagement.dto.user.UpdateRoleDTO;
+import com.example.BookManagement.dto.user.UserDTO;
+import com.example.BookManagement.dto.user.UserPageResponse;
+import com.example.BookManagement.dto.user.UserRequestDTO;
 import com.example.BookManagement.entity.User;
-import com.example.BookManagement.form.RegisterForm;
 import com.example.BookManagement.form.UserFilterForm;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-
-import java.util.List;
 
 public interface IUserService  {
     UserPageResponse getAllUsers(UserFilterForm form, Pageable pageable);

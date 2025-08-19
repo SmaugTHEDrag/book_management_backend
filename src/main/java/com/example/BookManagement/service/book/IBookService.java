@@ -1,14 +1,11 @@
-package com.example.BookManagement.service;
+package com.example.BookManagement.service.book;
 
-import com.example.BookManagement.dto.BookDTO;
-import com.example.BookManagement.dto.BookPageResponse;
-import com.example.BookManagement.dto.BookRequestDTO;
+import com.example.BookManagement.dto.book.BookDTO;
+import com.example.BookManagement.dto.book.BookPageResponse;
+import com.example.BookManagement.dto.book.BookRequestDTO;
 import com.example.BookManagement.entity.Book;
 import com.example.BookManagement.form.BookFilterForm;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
-import java.util.List;
 
 public interface IBookService {
     BookPageResponse getAllBooks(BookFilterForm form, Pageable pageable);

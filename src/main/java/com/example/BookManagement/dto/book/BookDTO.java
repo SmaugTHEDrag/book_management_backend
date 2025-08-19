@@ -1,4 +1,4 @@
-package com.example.BookManagement.dto;
+package com.example.BookManagement.dto.book;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;

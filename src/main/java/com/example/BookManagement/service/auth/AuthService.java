@@ -1,6 +1,6 @@
-package com.example.BookManagement.service;
+package com.example.BookManagement.service.auth;
 
-import com.example.BookManagement.dto.UserDTO;
+import com.example.BookManagement.dto.user.UserDTO;
 import com.example.BookManagement.entity.Role;
 import com.example.BookManagement.entity.User;
 import com.example.BookManagement.form.RegisterForm;

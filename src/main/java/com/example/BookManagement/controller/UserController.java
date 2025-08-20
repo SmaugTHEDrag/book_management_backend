@@ -28,7 +28,7 @@ public class UserController
     @Autowired
     private ModelMapper modelMapper;
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping
     public ResponseEntity<UserPageResponse> getAllUsers(UserFilterForm form, @PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable pageable){
         return ResponseEntity.ok(userService.getAllUsers(form, pageable));
@@ -41,6 +41,7 @@ public class UserController
         return ResponseEntity.ok(userDTO);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping
     public ResponseEntity<UserDTO> createUser(@RequestBody @Valid UserRequestDTO userRequestDTO){
         UserDTO createUserDTO = userService.createUser(userRequestDTO);
@@ -53,6 +54,7 @@ public class UserController
         return ResponseEntity.ok(updateUserDTO);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("{id}/role")
     public ResponseEntity<?> updateUserRole(@PathVariable int id, @RequestBody UpdateRoleDTO updateRoleDTO){
         try {
@@ -63,6 +65,7 @@ public class UserController
         }
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("{id}")
     public ResponseEntity<Object> deleteUser(@PathVariable int id){
         userService.deleteUser(id);

@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriUtils;
 
 @RestController
 @RequestMapping("api/books")
@@ -38,21 +39,21 @@ public class BookController {
         return ResponseEntity.ok(bookDTO);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping
     public ResponseEntity<BookDTO> createBook(@RequestBody @Valid BookRequestDTO bookRequestDTO){
         BookDTO createBookDTO = bookService.createBook(bookRequestDTO);
         return new ResponseEntity<>(createBookDTO,HttpStatus.CREATED);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("{id}")
     public ResponseEntity<BookDTO> updateBook(@PathVariable int id, @RequestBody @Valid BookRequestDTO bookRequestDTO){
         BookDTO updateBookDTO = bookService.updateBook(id, bookRequestDTO);
         return ResponseEntity.ok(updateBookDTO);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("{id}")
     public ResponseEntity<Object> deleteBook(@PathVariable int id){
         bookService.deleteBook(id);

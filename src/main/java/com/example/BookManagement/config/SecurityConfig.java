@@ -8,6 +8,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -19,6 +20,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import java.util.List;
 
 @Configuration
+@EnableMethodSecurity
 public class SecurityConfig {
     private final IAuthService userService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -41,15 +43,10 @@ public class SecurityConfig {
                     return config;
                 }))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.OPTIONS,"/**").permitAll()
                         .requestMatchers("/api/login").permitAll()
                         .requestMatchers("/api/register").permitAll()
-                        .requestMatchers("/api/books/**").permitAll()
-                        .requestMatchers("/api/blogs/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/users").hasAuthority("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/users/**").hasAuthority("ADMIN")
-                        .requestMatchers("/api/users/**").authenticated()
-                        .requestMatchers("/api/favorites/**").hasAnyAuthority("ADMIN", "CUSTOMER")
+                        .requestMatchers(HttpMethod.GET, "/api/blogs/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/books/**").permitAll()
                         .requestMatchers(
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",

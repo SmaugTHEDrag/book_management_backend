@@ -35,7 +35,7 @@ public class BlogService implements IBlogService{
     @Override
     public List<BlogDTO> getAllBlogs() {
         return blogRepository.findAll().stream()
-                .map(blog -> modelMapper.map(blog, BlogDTO.class))
+                .map(this::mapBlogWithComments)
                 .collect(Collectors.toList());
     }
 
@@ -43,8 +43,47 @@ public class BlogService implements IBlogService{
     public BlogDTO getBlogById(int id) {
         Blog blog = blogRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Blog not found"));
-        return modelMapper.map(blog, BlogDTO.class);
+        return mapBlogWithComments(blog);
     }
+
+    // ----------------------------
+// map Blog + comments + nested replies
+    private BlogDTO mapBlogWithComments(Blog blog) {
+        BlogDTO dto = modelMapper.map(blog, BlogDTO.class);
+
+        // likeCount
+        dto.setLikeCount(blog.getBlogLikes() != null ? (long) blog.getBlogLikes().size() : 0);
+
+        // only top-level comments
+        if (blog.getBlogComments() != null) {
+            dto.setComments(blog.getBlogComments().stream()
+                    .filter(c -> c.getParentComment() == null)   // lọc top-level
+                    .map(this::mapComment)
+                    .collect(Collectors.toList()));
+        } else {
+            dto.setComments(Collections.emptyList());
+        }
+
+        return dto;
+    }
+
+    // recursive map for BlogComment -> BlogCommentDTO
+    private BlogCommentDTO mapComment(BlogComment comment) {
+        BlogCommentDTO dto = modelMapper.map(comment, BlogCommentDTO.class);
+        dto.setUsername(comment.getUser().getUsername());
+
+        // nested replies
+        if (comment.getChildComment() != null && !comment.getChildComment().isEmpty()) {
+            dto.setReplies(comment.getChildComment().stream()
+                    .map(this::mapComment)
+                    .collect(Collectors.toList()));
+        } else {
+            dto.setReplies(Collections.emptyList());
+        }
+
+        return dto;
+    }
+
 
     @Override
     public BlogDTO createBlog(BlogRequestDTO blogRequestDTO, String username) {

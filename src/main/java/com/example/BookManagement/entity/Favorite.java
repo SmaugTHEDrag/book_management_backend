@@ -3,14 +3,12 @@ package com.example.BookManagement.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
-
 import java.time.LocalDateTime;
+
 /*
-*
 * Favorite book entity marked by user
 * Each user can favorite a book only once (enforced by unique constraint)
-*
-* */
+*/
 @Entity
 @Table(name = "favorites", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"user_id", "book_id"})

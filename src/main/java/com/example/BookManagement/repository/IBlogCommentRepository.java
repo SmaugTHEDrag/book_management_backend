@@ -6,7 +6,17 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
+/*
+* Repository interface for Blog Comment entity
+* Provide CRUD operations and custom queries for managing comments on blogs
+*
+* JpaRepository gives basic CRUD methods (save, findById, findAll, delete, etc.).
+ */
 public interface IBlogCommentRepository extends JpaRepository<BlogComment, Integer> {
+
+    // Get all top-level comment (comment without parent comment) for a specific blog
     List<BlogComment> findAllByBlogAndParentCommentIsNull(Blog blog);
+
+    // Get all comments (including replies) for a specific blog
     List<BlogComment> findAllByBlog(Blog blog);
 }

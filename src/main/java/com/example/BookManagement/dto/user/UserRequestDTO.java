@@ -8,8 +8,8 @@ import lombok.Data;
 
 /*
  * Data Transfer Object (DTO) for creating and updating a user
- * Receives input from client (request body) for user registration or admin operations.
- * Validation ensures input data is correct before service processing.
+ * Receives input from client (request body) for user registration or admin operations
+ * Validation ensures input data is correct before service processing
  */
 @Data
 public class UserRequestDTO {

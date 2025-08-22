@@ -10,34 +10,41 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+/*
+ * Data Transfer Object (DTO) for Book Entity
+ * Used to send book information between backend and client
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class BookDTO {
+
+    // Book ID
     private Integer id;
 
-    @NotBlank(message = "Title must not blank")
-    @Size(min = 2, max = 255, message = "Title length must be between 2 and 255")
+    // Title of the book
     private String title;
 
-    @NotBlank(message = "Author must not blank")
+    // Author of the book
     private String author;
 
-    @NotBlank(message = "Category must not blank")
+    // Category or genre of the book
     private String category;
 
-    @Pattern(regexp = "^(https?|ftp)://.*$", message = "Image must be a valid URL")
+    // URL of the book cover image
     private String image;
 
-    @Size(max = 2000, message = "Description must be less than 2000 characters")
+    // Description of the book, e.g., summary or review
     private String description;
 
-    @Pattern(regexp = "^(https?|ftp)://.*\\.pdf$", message = "PDF must be a valid PDF URL")
+    // URL of the book's PDF file (if available)
     private String pdf;
 
+    // Book creation timestamp
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
 
+    // Book last update timestamp
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updatedAt;
 }

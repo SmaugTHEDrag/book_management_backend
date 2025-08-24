@@ -3,14 +3,22 @@ package com.example.BookManagement.dto.blog;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
+/*
+ * Data Transfer Object (DTO) for creating or updating a blog
+ * Receives input from client (request body) for blog management operations
+ * Validation ensures input data is correct before service processing
+ */
 @Data
 public class BlogRequestDTO {
 
-    @NotBlank(message = "Title is required")
+    // Title of the blog
+    @NotBlank(message = "Title cannot be blank")
     private String title;
 
-    @NotBlank(message = "Content is required")
+    // Content of the blog
+    @NotBlank(message = "Content cannot be blank")
     private String content;
 
-    private String image; // Optional image URL
+    // Optional image URL associated with the blog
+    private String image;
 }

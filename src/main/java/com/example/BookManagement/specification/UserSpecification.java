@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class UserSpecification {
 
-    /*
+    /**
      * Create a dynamic WHERE clause based on search filters from UserFilterForm.
      *
      * @param form The filter data (username, email, role, ID range).

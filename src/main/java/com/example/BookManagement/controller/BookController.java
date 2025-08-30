@@ -18,20 +18,39 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriUtils;
 
+/*
+ * REST Controller for Book Management.
+ * Handles CRUD operations and retrieval of books.
+ */
 @RestController
 @RequestMapping("api/books")
 public class BookController {
     @Autowired
-    private IBookService bookService;
+    private IBookService bookService;  // Service layer for book operations
 
     @Autowired
-    private ModelMapper modelMapper;
+    private ModelMapper modelMapper;  // Maps entity objects to DTOs
 
+    /**
+     * Get a paginated list of books with optional filters.
+     * Accessible by all users.
+     *
+     * @param form     filter form (title, author, genre, etc.)
+     * @param pageable pagination and sorting info
+     * @return paginated list of books
+     */
     @GetMapping
     public ResponseEntity<BookPageResponse> getAllBooks(BookFilterForm form, @PageableDefault(page = 0, size = 9, sort = "id", direction = Sort.Direction.ASC) Pageable pageable){
         return ResponseEntity.ok(bookService.getAllBooks(form,pageable));
     }
 
+    /**
+     * Get a single book by its ID.
+     * Accessible by all users.
+     *
+     * @param id book ID
+     * @return book data mapped to BookDTO
+     */
     @GetMapping("{id}")
     public ResponseEntity<BookDTO> getBookById(@PathVariable int id){
         Book book = bookService.getBookById(id);
@@ -39,6 +58,13 @@ public class BookController {
         return ResponseEntity.ok(bookDTO);
     }
 
+    /**
+     * Create a new book.
+     * Only ADMIN users can create books.
+     *
+     * @param bookRequestDTO DTO containing book info
+     * @return created book data with HTTP 201 status
+     */
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping
     public ResponseEntity<BookDTO> createBook(@RequestBody @Valid BookRequestDTO bookRequestDTO){
@@ -46,6 +72,14 @@ public class BookController {
         return new ResponseEntity<>(createBookDTO,HttpStatus.CREATED);
     }
 
+    /**
+     * Update an existing book by ID.
+     * Only ADMIN users can update books.
+     *
+     * @param id             book ID
+     * @param bookRequestDTO DTO containing updated fields
+     * @return updated book data
+     */
     @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("{id}")
     public ResponseEntity<BookDTO> updateBook(@PathVariable int id, @RequestBody @Valid BookRequestDTO bookRequestDTO){
@@ -53,6 +87,13 @@ public class BookController {
         return ResponseEntity.ok(updateBookDTO);
     }
 
+    /**
+     * Delete a book by ID.
+     * Only ADMIN users can delete books.
+     *
+     * @param id book ID
+     * @return confirmation message
+     */
     @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("{id}")
     public ResponseEntity<Object> deleteBook(@PathVariable int id){

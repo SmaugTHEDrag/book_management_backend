@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class BookSpecification {
 
-    /*
+    /**
      * Create a dynamic WHERE clause based on filters from BookFilterForm.
      *
      * @param form The filter data (title, author, category, ID range, etc.).

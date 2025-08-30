@@ -15,6 +15,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Service responsible for interacting with the Gemini generative language API
+ * <p>
+ * This service prepares requests including system prompts, user messages,
+ * chat history, and optional file data. It also parses and cleans responses
+ * from the API to return text suitable for the frontend.
+ */
 @Service
 @Slf4j
 public class ChatService {
@@ -34,6 +41,12 @@ public class ChatService {
         this.systemPromptService = systemPromptService;
     }
 
+    /**
+     * Generates a response from the Gemini API based on the given user message and optional chat history.
+     *
+     * @param chatRequest the chat request containing the message, chat history, and optional file data
+     * @return ChatResponse containing the AI-generated text
+     */
     public ChatResponse generateResponse(ChatRequest chatRequest) {
         try {
             // Build request payload for Gemini API with system prompt
@@ -59,7 +72,7 @@ public class ChatService {
             JsonNode responseJson = objectMapper.readTree(response.getBody());
             String generatedText = extractGeneratedText(responseJson);
 
-            // Clean up response text (remove markdown formatting)
+            // Clean up response text (remove Markdown formatting)
             String cleanedText = cleanResponseText(generatedText);
 
             return new ChatResponse(cleanedText);
@@ -74,6 +87,9 @@ public class ChatService {
         }
     }
 
+    /*
+     * Builds the request payload for the Gemini API, including system prompt, chat history, and user message.
+     */
     private Map<String, Object> buildGeminiRequest(ChatRequest chatRequest) {
         Map<String, Object> request = new HashMap<>();
         List<Map<String, Object>> contents = new ArrayList<>();
@@ -164,7 +180,7 @@ public class ChatService {
         return request;
     }
 
-    /**
+    /*
      * Maps various role names to Gemini-compatible roles
      * Gemini only accepts "user" and "model" as valid roles
      */
@@ -191,6 +207,9 @@ public class ChatService {
         }
     }
 
+    /*
+     * Extracts the generated text from Gemini API response JSON.
+     */
     private String extractGeneratedText(JsonNode responseJson) {
         try {
             return responseJson
@@ -207,6 +226,9 @@ public class ChatService {
         }
     }
 
+    /*
+     * Cleans up the AI-generated text by removing Markdown formatting and trimming whitespace.
+     */
     private String cleanResponseText(String text) {
         if (text == null) return "";
 

@@ -20,6 +20,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/*
+ * Service implementation for managing blogs.
+ * This class contains the main business logic for creating, reading,
+ * updating, and deleting blogs, as well as mapping comments and replies.
+ */
 @Service
 public class BlogService implements IBlogService{
 
@@ -32,47 +37,18 @@ public class BlogService implements IBlogService{
     @Autowired
     private ModelMapper modelMapper;
 
-    @Override
-    public List<BlogDTO> getAllBlogs() {
-        return blogRepository.findAll().stream()
-                .map(this::mapBlogWithComments)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public BlogDTO getBlogById(int id) {
-        Blog blog = blogRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Blog not found"));
-        return mapBlogWithComments(blog);
-    }
-
-    // ----------------------------
-// map Blog + comments + nested replies
-    private BlogDTO mapBlogWithComments(Blog blog) {
-        BlogDTO dto = modelMapper.map(blog, BlogDTO.class);
-
-        // likeCount
-        dto.setLikeCount(blog.getBlogLikes() != null ? (long) blog.getBlogLikes().size() : 0);
-
-        // only top-level comments
-        if (blog.getBlogComments() != null) {
-            dto.setComments(blog.getBlogComments().stream()
-                    .filter(c -> c.getParentComment() == null)   // lọc top-level
-                    .map(this::mapComment)
-                    .collect(Collectors.toList()));
-        } else {
-            dto.setComments(Collections.emptyList());
-        }
-
-        return dto;
-    }
-
-    // recursive map for BlogComment -> BlogCommentDTO
+    /**
+     * Recursively map a {@link BlogComment} entity to {@link BlogCommentDTO},
+     * including all nested replies.
+     *
+     * @param comment the blog comment entity
+     * @return a BlogCommentDTO containing comment details and nested replies
+     */
     private BlogCommentDTO mapComment(BlogComment comment) {
         BlogCommentDTO dto = modelMapper.map(comment, BlogCommentDTO.class);
         dto.setUsername(comment.getUser().getUsername());
 
-        // nested replies
+        // Map replies if available
         if (comment.getChildComment() != null && !comment.getChildComment().isEmpty()) {
             dto.setReplies(comment.getChildComment().stream()
                     .map(this::mapComment)
@@ -84,13 +60,74 @@ public class BlogService implements IBlogService{
         return dto;
     }
 
+    /**
+     * Map a {@link Blog} entity to {@link BlogDTO}, including top-level comments
+     * and their nested replies, as well as like count.
+     *
+     * @param blog the blog entity
+     * @return a BlogDTO with blog details, like count, and mapped comments
+     */
+    private BlogDTO mapBlogWithComments(Blog blog) {
+        BlogDTO dto = modelMapper.map(blog, BlogDTO.class);
 
+        // Set like count
+        dto.setLikeCount(blog.getBlogLikes() != null ? (long) blog.getBlogLikes().size() : 0);
+
+        // Map only top-level comments
+        if (blog.getBlogComments() != null) {
+            dto.setComments(blog.getBlogComments().stream()
+                    .filter(c -> c.getParentComment() == null)   // only top-level
+                    .map(this::mapComment)
+                    .collect(Collectors.toList()));
+        } else {
+            dto.setComments(Collections.emptyList());
+        }
+
+        return dto;
+    }
+
+    /**
+     * Get all blogs with their comments and like counts.
+     *
+     * @return a list of BlogDTO objects containing blog details
+     */
+    @Override
+    public List<BlogDTO> getAllBlogs() {
+        return blogRepository.findAll().stream()
+                .map(this::mapBlogWithComments)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Get a single blog by its ID.
+     *
+     * @param id the blog ID
+     * @return BlogDTO containing blog details
+     * @throws RuntimeException if the blog is not found
+     */
+    @Override
+    public BlogDTO getBlogById(int id) {
+        Blog blog = blogRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Blog not found"));
+        return mapBlogWithComments(blog);
+    }
+
+
+    /**
+     * Create a new blog post.
+     *
+     * @param blogRequestDTO DTO containing blog title, content, and optional image
+     * @param username       username of the blog owner
+     * @return BlogDTO containing the created blog details
+     * @throws RuntimeException      if the user is not found
+     * @throws IllegalArgumentException if title or content is missing
+     */
     @Override
     public BlogDTO createBlog(BlogRequestDTO blogRequestDTO, String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Validate cơ bản
+        // Basic validation
         if (blogRequestDTO.getTitle() == null || blogRequestDTO.getTitle().isBlank()) {
             throw new IllegalArgumentException("Title is required");
         }
@@ -98,7 +135,7 @@ public class BlogService implements IBlogService{
             throw new IllegalArgumentException("Content is required");
         }
 
-        // Map từ DTO sang Entity
+        // Map DTO to entity
         Blog blog = modelMapper.map(blogRequestDTO, Blog.class);
         blog.setUser(user);
 
@@ -107,17 +144,40 @@ public class BlogService implements IBlogService{
         return modelMapper.map(saved, BlogDTO.class);
     }
 
+    /**
+     * Check if the given username belongs to an admin user.
+     *
+     * @param username the username to check
+     * @return true if the user is an admin, false otherwise
+     */
+    private boolean isAdmin(String username) {
+        return userRepository.findByUsername(username)
+                .map(user -> user.getRole() == Role.ADMIN)
+                .orElse(false);
+    }
+
+    /**
+     * Update an existing blog post.
+     * Only the blog owner or an admin can update.
+     *
+     * @param id             blog ID
+     * @param blogRequestDTO DTO containing updated blog fields
+     * @param username       username of the blog owner or admin
+     * @return BlogDTO containing the updated blog details
+     * @throws RuntimeException     if the blog is not found
+     * @throws AccessDeniedException if the user does not have permission
+     */
     @Override
     public BlogDTO updateBlog(int id, BlogRequestDTO blogRequestDTO, String username) {
         Blog blog = blogRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Blog not found"));
 
-        // ✅ Kiểm tra quyền
+        // Permission check
         if (!blog.getUser().getUsername().equals(username) && !isAdmin(username)) {
             throw new AccessDeniedException("You do not have permission to update this blog");
         }
 
-        // Chỉ update nếu trường được truyền
+        // Update only provided fields
         if (blogRequestDTO.getTitle() != null && !blogRequestDTO.getTitle().isBlank()) {
             blog.setTitle(blogRequestDTO.getTitle());
         }
@@ -132,23 +192,26 @@ public class BlogService implements IBlogService{
         return modelMapper.map(updatedBlog, BlogDTO.class);
     }
 
+    /**
+     * Delete a blog post.
+     * Only the blog owner or an admin can delete.
+     *
+     * @param id       blog ID
+     * @param username username of the blog owner or admin
+     * @throws RuntimeException     if the blog is not found
+     * @throws AccessDeniedException if the user does not have permission
+     */
     @Override
     public void deleteBlog(int id, String username) {
         Blog blog = blogRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Blog not found"));
 
-        // ✅ Kiểm tra quyền
+        // Permission check
         if (!blog.getUser().getUsername().equals(username) && !isAdmin(username)) {
             throw new AccessDeniedException("You do not have permission to delete this blog");
         }
 
         blogRepository.delete(blog);
-    }
-
-    private boolean isAdmin(String username) {
-        return userRepository.findByUsername(username)
-                .map(user -> user.getRole() == Role.ADMIN)  // 👈 so sánh enum
-                .orElse(false);
     }
 
 }

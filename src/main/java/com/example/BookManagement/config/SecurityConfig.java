@@ -19,6 +19,10 @@ import org.springframework.web.cors.CorsConfiguration;
 
 import java.util.List;
 
+/*
+ * Spring Security configuration class.
+ * Configures JWT authentication, CORS, session management, and endpoint authorization.
+ */
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
@@ -30,19 +34,31 @@ public class SecurityConfig {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
+    /*
+     * Configure the SecurityFilterChain.
+     * - Disable CSRF since we use JWT (stateless)
+     * - Configure CORS
+     * - Define which endpoints are public vs. authenticated
+     * - Stateless session (JWT)
+     * - Add JWT filter before UsernamePasswordAuthenticationFilter
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
+                // Disable CSRF protection since JWT is used
                 .csrf(AbstractHttpConfigurer::disable)
+                // CORS configuration
                 .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration config = new CorsConfiguration();
-                    config.setAllowedOriginPatterns(List.of("*")); // allow all
-                    config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-                    config.setAllowedHeaders(List.of("*"));
-                    config.setAllowCredentials(true); // cần cho JWT hoặc cookie
+                    config.setAllowedOriginPatterns(List.of("*")); // allow all origins
+                    config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")); // allowed HTTP methods
+                    config.setAllowedHeaders(List.of("*")); // allow all headers
+                    config.setAllowCredentials(true); // needed for JWT or cookie-based authentication
                     return config;
                 }))
+                // Define endpoint authorization rules
                 .authorizeHttpRequests(auth -> auth
+                        // Public endpoints: login, register, fetching blogs/books, chat, Swagger docs
                         .requestMatchers("/api/login").permitAll()
                         .requestMatchers("/api/register").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/blogs/**").permitAll()
@@ -53,10 +69,14 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/swagger-ui.html"
                         ).permitAll()
+                        // Any other request requires authentication
                         .anyRequest().authenticated()
                 )
+                // Stateless session management (JWT tokens, no server-side session)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                // Set authentication provider (user details + password encoder)
                 .authenticationProvider(authenticationProvider())
+                // Add custom JWT filter before the default username/password authentication filter
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }

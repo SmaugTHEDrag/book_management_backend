@@ -15,31 +15,49 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/*
+ * REST Controller responsible for user authentication.
+ * Handles login requests and returns a JWT token along with user information.
+ */
 @RestController
 @RequestMapping("api/login")
 public class LoginController {
     @Autowired
-    private AuthenticationManager authenticationManager;
+    private AuthenticationManager authenticationManager; // Spring Security's authentication manager
 
+    /**
+     * Authenticates the user using provided login credentials and returns a JWT token.
+     *
+     * @param loginForm login credentials containing username/email and password
+     * @return ResponseEntity containing JWT token, username, and role
+     */
     @PostMapping
     public ResponseEntity<Object> login(@RequestBody LoginForm loginForm) {
+        // Authenticate the user
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginForm.getLogin(), loginForm.getPassword())
         );
+
+        // Set authentication in the security context
         SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        // Generate JWT token for the authenticated user
         String jwt = JwtUtils.generateJwt(authentication);
 
+        // Retrieve username and role from authentication
         String username = authentication.getName();
         String role = authentication.getAuthorities().stream()
                 .findFirst()
                 .map(GrantedAuthority::getAuthority)
                 .orElse(null);
 
+        // Build response object
         LoginResponse loginResponse = new LoginResponse();
         loginResponse.setToken(jwt);
         loginResponse.setLogin(username);
         loginResponse.setRole(role);
 
+        // Return JWT and user info in response
         return ResponseEntity.ok(loginResponse);
     }
 

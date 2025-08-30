@@ -8,15 +8,38 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * REST Controller for handling chat interactions with the Book Assistant.
+ * Provides endpoints to generate chat responses and check service health.
+ */
 @RestController
 @RequestMapping("/api/chat")
-@RequiredArgsConstructor
-@Slf4j
-@CrossOrigin(origins = "*")
+@RequiredArgsConstructor  // Automatically injects final fields (ChatService)
+@Slf4j  // Lombok annotation for logging
+@CrossOrigin(origins = "*")  // Allow requests from any origin (for frontend)
 public class ChatController {
 
-    private final ChatService geminiService;
+    private final ChatService geminiService;  // Service layer handling chat logic
 
+
+    /**
+     * GET /api/chat/health
+     * Simple health check endpoint to verify that the chat service is running.
+     *
+     * @return ResponseEntity with a string message indicating service status
+     */
+    @GetMapping("/health")
+    public ResponseEntity<String> healthCheck() {
+        return ResponseEntity.ok("Chat service is running");
+    }
+
+    /**
+     * POST /api/chat/generate
+     * Generates a chat response from the Book Assistant based on the user's message.
+     *
+     * @param chatRequest The chat request containing the message and optional context
+     * @return ResponseEntity containing the ChatResponse from the assistant
+     */
     @PostMapping("/generate")
     public ResponseEntity<ChatResponse> generateChatResponse(@RequestBody ChatRequest chatRequest) {
         log.info("Received chat request: {}", chatRequest.getMessage());
@@ -35,8 +58,4 @@ public class ChatController {
         }
     }
 
-    @GetMapping("/health")
-    public ResponseEntity<String> healthCheck() {
-        return ResponseEntity.ok("Chat service is running");
-    }
 }

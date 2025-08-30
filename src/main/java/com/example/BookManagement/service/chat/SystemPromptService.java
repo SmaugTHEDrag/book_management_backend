@@ -2,6 +2,12 @@ package com.example.BookManagement.service.chat;
 
 import org.springframework.stereotype.Service;
 
+/*
+ * Service that provides system prompts for the Book Assistant chatbot.
+ *
+ * This service centralizes the system prompt text used for AI chat responses,
+ * and can generate contextual prompts by including user messages
+ */
 @Service
 public class SystemPromptService {
     private static final String BOOK_ASSISTANT_SYSTEM_PROMPT = """
@@ -41,10 +47,23 @@ public class SystemPromptService {
         Remember: Your main goal is to help users discover great books they'll love and make their book discovery experience enjoyable and productive.
         """;
 
+    /**
+     * Returns the fixed system prompt for the Book Assistant.
+     *
+     * @return system prompt string
+     */
     public String getSystemPrompt() {
         return BOOK_ASSISTANT_SYSTEM_PROMPT;
     }
 
+    /**
+     * Returns a contextual prompt that combines the system prompt with a specific
+     * user message. This can be used to provide the AI model with context for generating
+     * responses.
+     *
+     * @param userMessage the user's message to include in the prompt
+     * @return contextual prompt string
+     */
     public String getContextualPrompt(String userMessage) {
         return String.format("""
             %s

@@ -145,18 +145,6 @@ public class BlogService implements IBlogService{
     }
 
     /**
-     * Check if the given username belongs to an admin user.
-     *
-     * @param username the username to check
-     * @return true if the user is an admin, false otherwise
-     */
-    private boolean isAdmin(String username) {
-        return userRepository.findByUsername(username)
-                .map(user -> user.getRole() == Role.ADMIN)
-                .orElse(false);
-    }
-
-    /**
      * Update an existing blog post.
      * Only the blog owner or an admin can update.
      *
@@ -171,11 +159,6 @@ public class BlogService implements IBlogService{
     public BlogDTO updateBlog(int id, BlogRequestDTO blogRequestDTO, String username) {
         Blog blog = blogRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Blog not found"));
-
-        // Permission check
-        if (!blog.getUser().getUsername().equals(username) && !isAdmin(username)) {
-            throw new AccessDeniedException("You do not have permission to update this blog");
-        }
 
         // Update only provided fields
         if (blogRequestDTO.getTitle() != null && !blogRequestDTO.getTitle().isBlank()) {
@@ -205,13 +188,6 @@ public class BlogService implements IBlogService{
     public void deleteBlog(int id, String username) {
         Blog blog = blogRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Blog not found"));
-
-        // Permission check
-        if (!blog.getUser().getUsername().equals(username) && !isAdmin(username)) {
-            throw new AccessDeniedException("You do not have permission to delete this blog");
-        }
-
         blogRepository.delete(blog);
     }
-
 }

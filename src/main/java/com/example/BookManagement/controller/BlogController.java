@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -78,6 +79,7 @@ public class BlogController {
      * @param principal the authenticated user
      * @return BlogDTO representing the updated blog
      */
+    @PreAuthorize("hasAuthority('ADMIN') or @blogSecurity.isOwner(#id, principal.name)")
     @PutMapping("/{id}")
     public ResponseEntity<BlogDTO> updateBlog(@PathVariable int id,
                                               @RequestBody BlogRequestDTO blogRequestDTO,
@@ -95,6 +97,7 @@ public class BlogController {
      * @param principal the authenticated user
      * @return ResponseEntity with no content
      */
+    @PreAuthorize("hasAuthority('ADMIN') or @blogSecurity.isOwner(#id, principal.name)")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBlog(@PathVariable int id,
                                            Principal principal) {

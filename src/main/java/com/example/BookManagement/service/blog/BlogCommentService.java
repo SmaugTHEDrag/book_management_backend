@@ -105,11 +105,6 @@ public class BlogCommentService implements IBlogCommentService {
         BlogComment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new RuntimeException("Comment not found"));
 
-        // chỉ author hoặc admin mới được edit — bạn có thể thay check role nếu cần
-        if (!comment.getUser().getUsername().equals(username)) {
-            throw new RuntimeException("Not authorized to edit this comment");
-        }
-
         if (request.getContent() != null) comment.setContent(request.getContent());
         if (request.getImage() != null) comment.setImage(request.getImage());
 
@@ -129,11 +124,6 @@ public class BlogCommentService implements IBlogCommentService {
     public void deleteComment(Integer commentId, String username) {
         BlogComment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new RuntimeException("Comment not found"));
-
-        if (!comment.getUser().getUsername().equals(username)) {
-            throw new RuntimeException("Not authorized to delete this comment");
-        }
-
         commentRepository.delete(comment);
     }
 

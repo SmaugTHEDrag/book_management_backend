@@ -5,6 +5,7 @@ import com.example.BookManagement.dto.blog.BlogCommentRequestDTO;
 import com.example.BookManagement.service.blog.IBlogCommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -59,6 +60,7 @@ public class BlogCommentController {
      * @param principal the authenticated user performing the update
      * @return the updated BlogCommentDTO
      */
+    @PreAuthorize("hasAuthority('ADMIN') or @commentSecurity.canEdit(#id, principal.name)")
     @PutMapping("/comments/{commentId}")
     public ResponseEntity<BlogCommentDTO> updateComment(@PathVariable Integer commentId,
                                                         @RequestBody BlogCommentRequestDTO request,
@@ -75,6 +77,7 @@ public class BlogCommentController {
      * @param principal the authenticated user performing the deletion
      * @return ResponseEntity with no content
      */
+    @PreAuthorize("hasAuthority('ADMIN') or @commentSecurity.canDelete(#id, principal.name)")
     @DeleteMapping("/comments/{commentId}")
     public ResponseEntity<Void> deleteComment(@PathVariable Integer commentId,
                                               Principal principal) {

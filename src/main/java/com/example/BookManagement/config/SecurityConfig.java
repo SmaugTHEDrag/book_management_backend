@@ -63,6 +63,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/register").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/blogs/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/books/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/ping").permitAll()
                         .requestMatchers("/api/chat/**").permitAll()
                         .requestMatchers(
                                 "/v3/api-docs/**",

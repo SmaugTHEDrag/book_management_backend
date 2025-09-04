@@ -29,6 +29,7 @@ public class RegisterController {
     private IAuthService userService; // Service layer to handle user registration logic
 
     /**
+     * POST /api/register
      * Registers a new user.
      *
      * @param registerForm the registration form containing user details (username, email, password)

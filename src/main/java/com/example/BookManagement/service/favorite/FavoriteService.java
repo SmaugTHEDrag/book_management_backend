@@ -36,6 +36,40 @@ public class FavoriteService implements IFavoriteService{
     private ModelMapper modelMapper;
 
     /**
+     * Retrieves all favorite books of a user.
+     *
+     * @param username username of the user whose favorites to retrieve
+     * @return list of FavoriteDTO containing book details
+     * @throws RuntimeException if the user is not found
+     */
+    @Override
+    public List<FavoriteDTO> getAllFavorites(String username) {
+        // Find the user by username
+        User user = userRepository.findByUsername(username)
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Get all favorites for this user
+        List<Favorite> favorites = favoriteRepository.findByUserId(user.getId());
+
+        // Convert favorites to DTOs
+        return favorites.stream()
+                .map(fav -> {
+                    Book book = fav.getBook();
+                    FavoriteDTO dto = new FavoriteDTO();
+                    dto.setId(fav.getId());
+                    dto.setBookId(book.getId());
+                    dto.setTitle(book.getTitle());
+                    dto.setAuthor(book.getAuthor());
+                    dto.setCategory(book.getCategory());
+                    dto.setImage(book.getImage());
+                    return dto;
+                })
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Adds a book to the user's favorites.
      *
      * @param request  DTO containing the book ID to add
@@ -73,7 +107,7 @@ public class FavoriteService implements IFavoriteService{
     /**
      * Removes a book from the user's favorites.
      *
-     * @param bookId   ID of the book to remove
+     * @param bookId ID of the book to remove
      * @param username username of the user removing the favorite
      * @throws RuntimeException if the user or favorite is not found
      */
@@ -91,39 +125,5 @@ public class FavoriteService implements IFavoriteService{
 
         // Delete the favorite record
         favoriteRepository.delete(favorite);
-    }
-
-    /**
-     * Retrieves all favorite books of a user.
-     *
-     * @param username username of the user whose favorites to retrieve
-     * @return list of FavoriteDTO containing book details
-     * @throws RuntimeException if the user is not found
-     */
-    @Override
-    public List<FavoriteDTO> getAllFavorites(String username) {
-        // Find the user by username
-        User user = userRepository.findByUsername(username)
-                .stream()
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        // Get all favorites for this user
-        List<Favorite> favorites = favoriteRepository.findByUserId(user.getId());
-
-        // Convert favorites to DTOs
-        return favorites.stream()
-                .map(fav -> {
-                    Book book = fav.getBook();
-                    FavoriteDTO dto = new FavoriteDTO();
-                    dto.setId(fav.getId());
-                    dto.setBookId(book.getId());
-                    dto.setTitle(book.getTitle());
-                    dto.setAuthor(book.getAuthor());
-                    dto.setCategory(book.getCategory());
-                    dto.setImage(book.getImage());
-                    return dto;
-                })
-                .collect(Collectors.toList());
     }
 }

@@ -32,10 +32,11 @@ public class BookController {
     private ModelMapper modelMapper;  // Maps entity objects to DTOs
 
     /**
+     * GET /api/books
      * Get a paginated list of books with optional filters.
      * Accessible by all users.
      *
-     * @param form     filter form (title, author, genre, etc.)
+     * @param form filter form (title, author, genre, etc.)
      * @param pageable pagination and sorting info
      * @return paginated list of books
      */
@@ -45,6 +46,7 @@ public class BookController {
     }
 
     /**
+     * GET /api/books/{id}
      * Get a single book by its ID.
      * Accessible by all users.
      *
@@ -59,6 +61,7 @@ public class BookController {
     }
 
     /**
+     * POST /api/books
      * Create a new book.
      * Only ADMIN users can create books.
      *
@@ -73,10 +76,11 @@ public class BookController {
     }
 
     /**
+     * PUT /api/books
      * Update an existing book by ID.
      * Only ADMIN users can update books.
      *
-     * @param id             book ID
+     * @param id book ID
      * @param bookRequestDTO DTO containing updated fields
      * @return updated book data
      */
@@ -88,6 +92,7 @@ public class BookController {
     }
 
     /**
+     * DELETE /api/books/{id}
      * Delete a book by ID.
      * Only ADMIN users can delete books.
      *

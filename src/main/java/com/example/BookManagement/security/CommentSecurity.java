@@ -8,6 +8,11 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+/*
+ * Component to handle permissions for BlogComment operations.
+ * Can be used with Spring Security @PreAuthorize
+ * @PreAuthorize("@commentSecurity.canDelete(#commentId, authentication.name)")
+ */
 @Component("commentSecurity")
 public class CommentSecurity {
 
@@ -17,6 +22,17 @@ public class CommentSecurity {
     @Autowired
     private IUserRepository userRepository;
 
+    /**
+     * Checks if a user can delete a comment.
+     * Rules:
+     * The comment owner can delete their own comment.
+     * The blog owner (of the blog containing the comment) can delete any comment on their blog.
+     * Otherwise, deletion is not allowed.
+     *
+     * @param commentId the ID of the comment
+     * @param username the username of the current user
+     * @return true if deletion is allowed, false otherwise
+     */
     public boolean canDelete(Integer commentId, String username) {
         if (commentId == null || username == null) {
             return false;
@@ -38,12 +54,22 @@ public class CommentSecurity {
                     if (blogOwner.equals(username)) {
                         return true;
                     }
-
+                    // Otherwise, user cannot delete this comment
                     return false;
                 })
                 .orElse(false);
     }
 
+    /**
+     * Checks if a user can edit a comment.
+     * Rules:
+     * Only the comment owner can edit their comment.
+     * Blog owner cannot edit others' comments.
+     *
+     * @param commentId the ID of the comment
+     * @param username the username of the current user
+     * @return true if editing is allowed, false otherwise
+     */
     public boolean canEdit(Integer commentId, String username) {
         if (commentId == null || username == null) {
             return false;

@@ -11,6 +11,14 @@ import java.util.List;
 public interface IFavoriteService {
 
     /**
+     * Get all favorite books of a user
+     *
+     * @param username the username of the user
+     * @return list of favorite books as DTOs
+     */
+    List<FavoriteDTO> getAllFavorites(String username);
+
+    /**
      * Add a book to the user's favorites
      *
      * @param favoriteRequestDTO details of the book to be added
@@ -27,11 +35,4 @@ public interface IFavoriteService {
      */
     void removeFavorite(Integer bookId, String username);
 
-    /**
-     * Get all favorite books of a user
-     *
-     * @param username the username of the user
-     * @return list of favorite books as DTOs
-     */
-    List<FavoriteDTO> getAllFavorites(String username);
 }

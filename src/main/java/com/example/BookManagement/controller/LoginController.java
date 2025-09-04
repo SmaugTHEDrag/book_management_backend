@@ -26,6 +26,7 @@ public class LoginController {
     private AuthenticationManager authenticationManager; // Spring Security's authentication manager
 
     /**
+     * POST /api/login
      * Authenticates the user using provided login credentials and returns a JWT token.
      *
      * @param loginForm login credentials containing username/email and password

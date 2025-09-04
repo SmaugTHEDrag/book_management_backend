@@ -40,7 +40,7 @@ public class UserController
      * Get all users with optional filters and pagination.
      * Only accessible by ADMIN users.
      *
-     * @param form     filter form (username, email, role, etc.)
+     * @param form filter form (username, email, role, etc.)
      * @param pageable pagination and sorting information
      * @return paginated user data
      */
@@ -82,7 +82,7 @@ public class UserController
      * Update an existing user's information.
      * Accessible by the user themselves or by ADMINs (depends on service logic).
      *
-     * @param id             user ID
+     * @param id userID
      * @param userRequestDTO DTO containing updated fields
      * @return updated user data
      */
@@ -93,10 +93,11 @@ public class UserController
     }
 
     /**
-     * Update a user's role (e.g., USER -> ADMIN).
-     * Only ADMIN users can update roles.
+     * PUT /api/users/{id}/role
+     * Update a user's role CUSTOMER -> ADMIN
+     * Only ADMIN users can update roles
      *
-     * @param id             user ID
+     * @param id userID
      * @param updateRoleDTO  DTO with the new role
      * @param bindingResult  validation result
      * @return success message or validation errors
@@ -121,10 +122,11 @@ public class UserController
     }
 
     /**
+     * DELETE /api/users/{id}
      * Delete a user by ID.
      * Only ADMIN users can delete other users.
      *
-     * @param id user ID
+     * @param id userID
      * @return success message
      */
     @PreAuthorize("hasAuthority('ADMIN')")

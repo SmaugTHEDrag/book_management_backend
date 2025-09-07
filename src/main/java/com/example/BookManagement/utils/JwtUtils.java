@@ -24,12 +24,7 @@ public class JwtUtils {
     private static final String SECRET = "ThisIsASecretKeyForJwtThatIsAtLeastSixtyFourCharactersLong123456!";
     private static final SecretKey SECRET_KEY = Keys.hmacShaKeyFor(SECRET.getBytes());
 
-    /**
-     * Generate a JWT for the authenticated user
-     *
-     * @param authentication The logged-in user’s authentication object
-     * @return A signed JWT string
-     */
+    // Generate a JWT for the authenticated user
     public static String generateJwt(Authentication authentication) {
         User user = (User) authentication.getPrincipal();
 
@@ -47,12 +42,7 @@ public class JwtUtils {
                 .compact();
     }
 
-    /**
-     * Validate a JWT token
-     *
-     * @param jwt The token string
-     * @return true if valid, false otherwise
-     */
+    // Validate a JWT token
     public static boolean validateJwt(String jwt) {
         try {
             Jwts.parserBuilder()
@@ -66,11 +56,7 @@ public class JwtUtils {
         return false;
     }
 
-    /**
-     * Extract username from JWT token.
-     * @param jwt The token string.
-     * @return The username stored in the token.
-     */
+    // Extract username from JWT token.
     public static String getUsername(String jwt) {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(SECRET_KEY)  // Set the signing key

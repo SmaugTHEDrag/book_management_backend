@@ -9,19 +9,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  */
 @ResponseStatus(HttpStatus.NOT_FOUND)
 
-/**
- * Constructs a new ResourceNotFoundException with the specified detail message.
- *
- * @param message Detailed message describing the missing resource
- */
+// Constructs a new ResourceNotFoundException with the specified detail message.
 public class ResourceNotFoundException extends RuntimeException{
 
-
-    /**
-     * Optional constructor to include a cause.
-     *
-     * @param message Detail message
-     */
+    // Optional constructor to include a cause.
     public ResourceNotFoundException(String message) {
         super(message);
     }

@@ -21,11 +21,8 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 /*
- * Service implementation for managing user-related operations.
- * This class provides business logic for:
- * - Fetching users with filtering & pagination
- * - Creating, updating, and deleting users
- * - Updating user roles
+ * Service implementation for managing user-related operations
+ * Defines the operations that the Book service must implement
  */
 @Service
 @Transactional
@@ -36,13 +33,7 @@ public class UserService implements IUserService{
     @Autowired
     private ModelMapper modelMapper;
 
-    /**
-     * Retrieves all users based on filter form and pagination info
-
-     * @param form filter criteria (username, email, role, etc.)
-     * @param pageable pagination and sorting information
-     * @return paginated response containing a list of {@link UserDTO}
-     */
+    // Retrieves all users based on filter form and pagination info
     @Override
     public UserPageResponse getAllUsers(UserFilterForm form, Pageable pageable) {
         Specification<User> where = UserSpecification.buildWhere(form);
@@ -61,23 +52,13 @@ public class UserService implements IUserService{
         );
     }
 
-    /**
-     * Finds a user by their ID
-
-     * @param id user ID
-     * @return User entity if found, otherwise null
-     */
+    // Finds a user by their ID
     @Override
     public User getUserById(int id) {
         return userRepository.findById(id).orElse(null);
     }
 
-    /**
-     * Creates a new user.
-
-     * @param userRequestDTO DTO containing new user data
-     * @return created {@link UserDTO}
-     */
+    // Creates a new user.
     @Override
     public UserDTO createUser(UserRequestDTO userRequestDTO) {
         User user = modelMapper.map(userRequestDTO, User.class);
@@ -87,14 +68,7 @@ public class UserService implements IUserService{
         return modelMapper.map(savedUser, UserDTO.class);
     }
 
-    /**
-     * Updates an existing user by ID
-
-     * @param id user ID
-     * @param userRequestDTO DTO containing updated user data
-     * @return updated {@link UserDTO}
-     * @throws ResourceNotFoundException if user is not found
-     */
+    // Updates an existing user by ID
     @Override
     public UserDTO updateUser(int id, UserRequestDTO userRequestDTO) {
         // Check if user exist
@@ -108,23 +82,13 @@ public class UserService implements IUserService{
         return modelMapper.map(updatedUser, UserDTO.class);
     }
 
-    /**
-     * Deletes a user by ID
-
-     * @param id user ID
-     */
+    // Deletes a user by ID
     @Override
     public void deleteUser(int id) {
         userRepository.deleteById(id);
     }
 
-    /**
-     * Updates the role of a user
-
-     * @param id user ID
-     * @param updateRoleDTO DTO containing the new role
-     * @throws RuntimeException if user is not found
-     */
+    // Updates the role of a user
     @Override
     public void updateUserRole(int id, UpdateRoleDTO updateRoleDTO) {
         Optional<User> optionalUser = userRepository.findById(id);

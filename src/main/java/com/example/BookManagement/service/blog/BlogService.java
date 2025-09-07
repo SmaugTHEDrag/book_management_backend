@@ -21,8 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /*
- * Service implementation for managing blogs.
- * This class contains the main business logic for creating, reading,
+ * Service implementation for managing blogs
  * updating, and deleting blogs, as well as mapping comments and replies.
  */
 @Service
@@ -37,13 +36,7 @@ public class BlogService implements IBlogService{
     @Autowired
     private ModelMapper modelMapper;
 
-    /**
-     * Recursively map a {@link BlogComment} entity to {@link BlogCommentDTO},
-     * including all nested replies.
-     *
-     * @param comment the blog comment entity
-     * @return a BlogCommentDTO containing comment details and nested replies
-     */
+    // Convert BlogComment entity to DTO (includes nested replies)
     private BlogCommentDTO mapComment(BlogComment comment) {
         BlogCommentDTO dto = modelMapper.map(comment, BlogCommentDTO.class);
         dto.setUsername(comment.getUser().getUsername());
@@ -60,13 +53,7 @@ public class BlogService implements IBlogService{
         return dto;
     }
 
-    /**
-     * Map a {@link Blog} entity to {@link BlogDTO}, including top-level comments
-     * and their nested replies, as well as like count.
-     *
-     * @param blog the blog entity
-     * @return a BlogDTO with blog details, like count, and mapped comments
-     */
+    // Convert Blog entity to DTO (includes top-level comments and like count)
     private BlogDTO mapBlogWithComments(Blog blog) {
         BlogDTO dto = modelMapper.map(blog, BlogDTO.class);
 
@@ -86,11 +73,7 @@ public class BlogService implements IBlogService{
         return dto;
     }
 
-    /**
-     * Get all blogs with their comments and like counts.
-     *
-     * @return a list of BlogDTO objects containing blog details
-     */
+    // Get all blogs with their comments and like counts.
     @Override
     public List<BlogDTO> getAllBlogs() {
         return blogRepository.findAll().stream()
@@ -98,13 +81,7 @@ public class BlogService implements IBlogService{
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Get a single blog by its ID.
-     *
-     * @param id the blog ID
-     * @return BlogDTO containing blog details
-     * @throws RuntimeException if the blog is not found
-     */
+    // Get a single blog by its ID.
     @Override
     public BlogDTO getBlogById(int id) {
         Blog blog = blogRepository.findById(id)
@@ -113,15 +90,7 @@ public class BlogService implements IBlogService{
     }
 
 
-    /**
-     * Create a new blog post.
-     *
-     * @param blogRequestDTO DTO containing blog title, content, and optional image
-     * @param username       username of the blog owner
-     * @return BlogDTO containing the created blog details
-     * @throws RuntimeException      if the user is not found
-     * @throws IllegalArgumentException if title or content is missing
-     */
+    // Create a new blog post.
     @Override
     public BlogDTO createBlog(BlogRequestDTO blogRequestDTO, String username) {
         User user = userRepository.findByUsername(username)
@@ -140,21 +109,10 @@ public class BlogService implements IBlogService{
         blog.setUser(user);
 
         Blog saved = blogRepository.save(blog);
-
         return modelMapper.map(saved, BlogDTO.class);
     }
 
-    /**
-     * Update an existing blog post.
-     * Only the blog owner or an admin can update.
-     *
-     * @param id             blog ID
-     * @param blogRequestDTO DTO containing updated blog fields
-     * @param username       username of the blog owner or admin
-     * @return BlogDTO containing the updated blog details
-     * @throws RuntimeException     if the blog is not found
-     * @throws AccessDeniedException if the user does not have permission
-     */
+    // Update a blog
     @Override
     public BlogDTO updateBlog(int id, BlogRequestDTO blogRequestDTO, String username) {
         Blog blog = blogRepository.findById(id)
@@ -175,15 +133,7 @@ public class BlogService implements IBlogService{
         return modelMapper.map(updatedBlog, BlogDTO.class);
     }
 
-    /**
-     * Delete a blog post.
-     * Only the blog owner or an admin can delete.
-     *
-     * @param id       blog ID
-     * @param username username of the blog owner or admin
-     * @throws RuntimeException     if the blog is not found
-     * @throws AccessDeniedException if the user does not have permission
-     */
+    // Delete a blog post by its ID
     @Override
     public void deleteBlog(int id, String username) {
         Blog blog = blogRepository.findById(id)

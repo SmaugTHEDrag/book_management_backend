@@ -21,13 +21,7 @@ public class FavoriteController {
     @Autowired
     private IFavoriteService favoriteService; // Service layer for favorite operations
 
-    /**
-     * GET /api/favorites
-     * Get all favorite books for the current logged-in user.
-     *
-     * @param principal authenticated user information
-     * @return list of favorite books as FavoriteDTO
-     */
+    //Get all favorite books for the current logged-in user.
     @GetMapping
     public ResponseEntity<List<FavoriteDTO>> getFavorites(Principal principal) {
         String username = principal.getName();
@@ -35,27 +29,13 @@ public class FavoriteController {
         return ResponseEntity.ok(favoriteService.getAllFavorites(principal.getName()));
     }
 
-    /**
-     * POST /api/favorites
-     * Add a book to the current user's favorites.
-     *
-     * @param request DTO containing the book ID to add
-     * @param principal authenticated user information
-     * @return the added favorite as FavoriteDTO
-     */
+    // Add a book to the current user's favorites.
     @PostMapping
     public ResponseEntity<FavoriteDTO> addFavorite(@RequestBody FavoriteRequestDTO request, Principal principal) {
         return ResponseEntity.ok(favoriteService.addFavorite(request, principal.getName()));
     }
 
-    /**
-     * DELETE /api/favorites/{bookId}
-     * Remove a book from the current user's favorites.
-     *
-     * @param bookId ID of the book to remove
-     * @param principal authenticated user information
-     * @return confirmation message
-     */
+    // Remove a book from the current user's favorites.
     @DeleteMapping("/{bookId}")
     public ResponseEntity<?> removeFavorite(@PathVariable Integer bookId, Principal principal) {
         favoriteService.removeFavorite(bookId, principal.getName());

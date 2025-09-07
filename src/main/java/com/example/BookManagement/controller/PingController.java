@@ -12,10 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("api/")
 public class PingController {
 
-    /**
-     * GET /api/ping
-     * @return a simple "OK" string to indicate the service is alive
-     */
+    // Return "OK" if the service is running
     @GetMapping("/ping")
     public String ping(){
         return "OK";

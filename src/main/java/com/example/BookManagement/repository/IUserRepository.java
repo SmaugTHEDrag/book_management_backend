@@ -8,13 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 /*
-* Repository interface for User entity
-* Provides methods to perform CRUD operations
-* as well as custom queries like finding by username or email
-* and checking if a username or email already exist
-*
-* JpaRepository gives basic CRUD methods (save, findById, findAll, delete, etc.).
-* JpaSpecificationExecutor allows building dynamic queries with specifications.
+ * Repository interface for User entity
  */
 public interface IUserRepository extends JpaRepository<User, Integer>, JpaSpecificationExecutor<User> {
 

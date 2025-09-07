@@ -28,14 +28,7 @@ public class RegisterController {
     @Autowired
     private IAuthService userService; // Service layer to handle user registration logic
 
-    /**
-     * POST /api/register
-     * Registers a new user.
-     *
-     * @param registerForm the registration form containing user details (username, email, password)
-     * @param bindingResult validation result for the request body
-     * @return ResponseEntity with created UserDTO on success or validation errors on failure
-     */
+    // Registers a new user.
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterForm registerForm, BindingResult bindingResult) {
 

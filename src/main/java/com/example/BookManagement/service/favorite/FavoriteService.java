@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /*
- * Service implementation for managing user's favorite books.
+ * Service implementation for managing user's favorite books
  */
 @Service
 @Transactional
@@ -35,13 +35,7 @@ public class FavoriteService implements IFavoriteService{
     @Autowired
     private ModelMapper modelMapper;
 
-    /**
-     * Retrieves all favorite books of a user.
-     *
-     * @param username username of the user whose favorites to retrieve
-     * @return list of FavoriteDTO containing book details
-     * @throws RuntimeException if the user is not found
-     */
+    // Retrieves all favorite books of a user.
     @Override
     public List<FavoriteDTO> getAllFavorites(String username) {
         // Find the user by username
@@ -69,15 +63,7 @@ public class FavoriteService implements IFavoriteService{
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Adds a book to the user's favorites.
-     *
-     * @param request  DTO containing the book ID to add
-     * @param username username of the user adding the favorite
-     * @return FavoriteDTO containing the saved favorite details
-     * @throws RuntimeException if the user or book is not found,
-     *                          or if the book is already in favorites
-     */
+    // Adds a book to the user's favorites.
     @Override
     public FavoriteDTO addFavorite(FavoriteRequestDTO request, String username) {
         // Find the user by username
@@ -104,13 +90,7 @@ public class FavoriteService implements IFavoriteService{
         return modelMapper.map(favoriteRepository.save(favorite), FavoriteDTO.class);
     }
 
-    /**
-     * Removes a book from the user's favorites.
-     *
-     * @param bookId ID of the book to remove
-     * @param username username of the user removing the favorite
-     * @throws RuntimeException if the user or favorite is not found
-     */
+    // Removes a book from the user's favorites.
     @Override
     public void removeFavorite(Integer bookId, String username) {
         // Find the user by username

@@ -29,39 +29,19 @@ public class BlogController {
     @Autowired
     private ModelMapper modelMapper;  // Used to map entities to DTOs
 
-    /**
-     * GET /api/blogs
-     * Retrieve a list of all blogs.
-     * Public endpoint (no authentication required if security permits).
-     *
-     * @return List of BlogDTO representing all blogs.
-     */
+    // Get all blogs
     @GetMapping
     public ResponseEntity<List<BlogDTO>> getAllBlogs() {
         return ResponseEntity.ok(blogService.getAllBlogs());
     }
 
-    /**
-     * GET /api/blogs/{id}
-     * Retrieve a specific blog by its ID.
-     *
-     * @param id the ID of the blog
-     * @return BlogDTO representing the blog
-     */
+    // Get blog by ID
     @GetMapping("/{id}")
     public ResponseEntity<BlogDTO> getBlogById(@PathVariable int id) {
         return ResponseEntity.ok(blogService.getBlogById(id));
     }
 
-    /**
-     * POST /api/blogs
-     * Create a new blog.
-     * The authenticated user's username is passed via Principal.
-     *
-     * @param blogRequestDTO the request body containing blog details
-     * @param principal the authenticated user
-     * @return BlogDTO representing the created blog
-     */
+    // Create blog (authenticated user)
     @PostMapping
     public ResponseEntity<BlogDTO> createBlog(@Valid @RequestBody BlogRequestDTO blogRequestDTO,
                                               Principal principal) {
@@ -69,16 +49,7 @@ public class BlogController {
         return ResponseEntity.ok(blogDTO);
     }
 
-    /**
-     * PUT /api/blogs/{id}
-     * Update an existing blog.
-     * Only the owner or authorized user can update the blog.
-     *
-     * @param id the ID of the blog to update
-     * @param blogRequestDTO the updated blog data
-     * @param principal the authenticated user
-     * @return BlogDTO representing the updated blog
-     */
+    // Update blog (owner or admin only)
     @PreAuthorize("hasAuthority('ADMIN') or @blogSecurity.isOwner(#id, principal.name)")
     @PutMapping("/{id}")
     public ResponseEntity<BlogDTO> updateBlog(@PathVariable int id,
@@ -88,15 +59,7 @@ public class BlogController {
         return ResponseEntity.ok(blogDTO);
     }
 
-    /**
-     * DELETE /api/blogs/{id}
-     * Delete an existing blog.
-     * Only the owner or authorized user can delete the blog.
-     *
-     * @param id the ID of the blog to delete
-     * @param principal the authenticated user
-     * @return ResponseEntity with no content
-     */
+    // Delete blog (owner or admin only)
     @PreAuthorize("hasAuthority('ADMIN') or @blogSecurity.isOwner(#id, principal.name)")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBlog(@PathVariable int id,

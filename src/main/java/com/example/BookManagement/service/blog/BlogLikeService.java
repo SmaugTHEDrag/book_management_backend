@@ -31,15 +31,7 @@ public class BlogLikeService implements IBlogLikeService{
     @Autowired
     private ModelMapper modelMapper;
 
-    /**
-     * Like a blog for the given user.
-     * Idempotent: if the user already liked the blog, returns existing like.
-     *
-     * @param blogId   ID of the blog to like
-     * @param username Username of the user liking the blog
-     * @return BlogLikeDTO containing like details
-     * @throws RuntimeException if the blog or user is not found
-     */
+    // Like a blog for the given user (idempotent: if the user already liked the blog, returns existing like)
     @Override
     public BlogLikeDTO likeBlog(Integer blogId, String username) {
         Blog blog = blogRepository.findById(blogId)
@@ -48,7 +40,7 @@ public class BlogLikeService implements IBlogLikeService{
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // nếu đã like rồi -> trả về hiện tại (idempotent)
+        // If already liked → return existing
         Optional<BlogLike> existing = likeRepository.findByBlogAndUser(blog, user);
         if (existing.isPresent()) {
             return mapToDTO(existing.get());
@@ -62,13 +54,8 @@ public class BlogLikeService implements IBlogLikeService{
         return mapToDTO(saved);
     }
 
-    /**
-     * Remove a user's like from a blog.
-     *
-     * @param blogId   ID of the blog to unlike
-     * @param username Username of the user unliking the blog
-     * @throws RuntimeException if the blog, user, or like record is not found
-     */
+
+    // Remove a user's like from a blog
     @Override
     public void unlikeBlog(Integer blogId, String username) {
         Blog blog = blogRepository.findById(blogId)
@@ -83,13 +70,7 @@ public class BlogLikeService implements IBlogLikeService{
         likeRepository.delete(like);
     }
 
-    /**
-     * Get the total number of likes for a specific blog.
-     *
-     * @param blogId ID of the blog
-     * @return total number of likes
-     * @throws RuntimeException if the blog is not found
-     */
+    // Get the total number of likes for a specific blog
     @Override
     public long getLikeCount(Integer blogId) {
         Blog blog = blogRepository.findById(blogId)
@@ -97,14 +78,7 @@ public class BlogLikeService implements IBlogLikeService{
         return likeRepository.countByBlog(blog);
     }
 
-    /**
-     * Check if a specific user has liked a specific blog.
-     *
-     * @param blogId   ID of the blog
-     * @param username Username of the user
-     * @return true if the user has liked the blog, false otherwise
-     * @throws RuntimeException if the blog or user is not found
-     */
+    // Check if a specific user has liked a specific blog
     @Override
     public boolean hasUserLiked(Integer blogId, String username) {
         Blog blog = blogRepository.findById(blogId)
@@ -114,12 +88,7 @@ public class BlogLikeService implements IBlogLikeService{
         return likeRepository.existsByBlogAndUser(blog, user);
     }
 
-    /**
-     * Map a BlogLike entity to BlogLikeDTO.
-     *
-     * @param like the BlogLike entity
-     * @return BlogLikeDTO with like details
-     */
+    // Map a BlogLike entity to BlogLikeDTO
     private BlogLikeDTO mapToDTO(BlogLike like) {
         BlogLikeDTO dto = new BlogLikeDTO();
         dto.setId(like.getId());

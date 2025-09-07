@@ -35,7 +35,7 @@ public class UserRequestDTO {
     @Email(message = "Email is valid")
     private String email;
 
-    // Role of the user: required, must be either ADMIN or USER
+    // Role of the user: required, must be either ADMIN or CUSTOMER
     @NotBlank(message = "Role cannot be blank")
     @Pattern(regexp = "ADMIN|CUSTOMER", message = "Role must be either ADMIN or CUSTOMER")
     private String role;

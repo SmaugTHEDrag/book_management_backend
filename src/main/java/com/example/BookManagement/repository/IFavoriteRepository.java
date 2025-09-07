@@ -7,10 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 /*
-* Repository interface for Favorite entity
-* Provide CRUD operation and custom queries for managing user favorites
-*
-* JpaRepository gives basic CRUD methods (save, findById, findAll, delete, etc.).
+ * Repository interface for Favorite entity
  */
 public interface IFavoriteRepository extends JpaRepository<Favorite, Integer> {
 

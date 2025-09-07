@@ -28,13 +28,8 @@ public class AuthService implements IAuthService{
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
-    /*
-     * Registers a new user with validation for duplicate username/email.
-     * Sets default role as CUSTOMER if not provided.
-     * @param registerForm form containing username, email, password, and optional role
-     * @return UserDTO containing the registered user's details
-     * @throws RuntimeException if the username or email already exists
-     */
+
+    // Registers a new user with validation for duplicate username/email (default role: CUSTOMER)
     @Override
     public UserDTO register(RegisterForm registerForm) {
         // Check for duplicate username
@@ -64,13 +59,7 @@ public class AuthService implements IAuthService{
         return modelMapper.map(savedUser, UserDTO.class);
     }
 
-    /*
-     * Loads a user by their username or email for Spring Security authentication.
-     *
-     * @param login username or email
-     * @return UserDetails object for Spring Security authentication
-     * @throws UsernameNotFoundException if no user is found with the given username or email
-     */
+    // Loads a user by their username or email for Spring Security authentication.
     @Override
     public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
         // Find user by email if login contains '@', otherwise by username

@@ -21,25 +21,13 @@ public class ChatController {
 
     private final ChatService geminiService;  // Service layer handling chat logic
 
-
-    /**
-     * GET /api/chat/health
-     * Simple health check endpoint to verify that the chat service is running.
-     *
-     * @return ResponseEntity with a string message indicating service status
-     */
+    // Simple health check endpoint to verify that the chat service is running
     @GetMapping("/health")
     public ResponseEntity<String> healthCheck() {
         return ResponseEntity.ok("Chat service is running");
     }
 
-    /**
-     * POST /api/chat/generate
-     * Generates a chat response from the Book Assistant based on the user's message.
-     *
-     * @param chatRequest The chat request containing the message and optional context
-     * @return ResponseEntity containing the ChatResponse from the assistant
-     */
+    // Generates chat response from the Book Assistant based on the user's message
     @PostMapping("/generate")
     public ResponseEntity<ChatResponse> generateChatResponse(@RequestBody ChatRequest chatRequest) {
         log.info("Received chat request: {}", chatRequest.getMessage());

@@ -13,12 +13,7 @@ import java.util.List;
  */
 public class BookSpecification {
 
-    /**
-     * Create a dynamic WHERE clause based on filters from BookFilterForm.
-     *
-     * @param form The filter data (title, author, category, ID range, etc.).
-     * @return Specification for database queries.
-     */
+    // Create a dynamic WHERE clause based on filters from BookFilterForm.
     public static Specification<Book> buildWhere(BookFilterForm form) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();

@@ -9,10 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 /*
-* Repository interface for Blog Like entity
-* Provide CRUD operations and custom queries for managing likes on blogs
-*
-* JpaRepository gives basic CRUD methods (save, findById, findAll, delete, etc.).
+ * Repository interface for Blog Like entity
  */
 public interface IBlogLikeRepository extends JpaRepository<BlogLike, Integer> {
 

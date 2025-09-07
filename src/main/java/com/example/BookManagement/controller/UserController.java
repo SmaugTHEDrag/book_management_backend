@@ -36,27 +36,14 @@ public class UserController
     @Autowired
     private ModelMapper modelMapper;  // Maps entity objects to DTOs
 
-    /**
-     * Get all users with optional filters and pagination.
-     * Only accessible by ADMIN users.
-     *
-     * @param form filter form (username, email, role, etc.)
-     * @param pageable pagination and sorting information
-     * @return paginated user data
-     */
+    // Get all users with filters and pagination (Admin only)
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping
     public ResponseEntity<UserPageResponse> getAllUsers(UserFilterForm form, @PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable pageable){
         return ResponseEntity.ok(userService.getAllUsers(form, pageable));
     }
 
-    /**
-     * Get a single user by ID.
-     * Accessible by any authenticated user.
-     *
-     * @param id user ID
-     * @return user data mapped to UserDTO
-     */
+    // Get user by ID
     @GetMapping("{id}")
     public ResponseEntity<UserDTO> getUserById(@PathVariable int id){
         User user = userService.getUserById(id);
@@ -64,13 +51,7 @@ public class UserController
         return ResponseEntity.ok(userDTO);
     }
 
-    /**
-     * Create a new user.
-     * Only ADMIN users can create other users.
-     *
-     * @param userRequestDTO incoming request DTO with user data
-     * @return created user data with HTTP 201 status
-     */
+    // Create a new user (Admin only)
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping
     public ResponseEntity<UserDTO> createUser(@RequestBody @Valid UserRequestDTO userRequestDTO){
@@ -78,30 +59,14 @@ public class UserController
         return new ResponseEntity<>(createUserDTO,HttpStatus.CREATED);
     }
 
-    /**
-     * Update an existing user's information.
-     * Accessible by the user themselves or by ADMINs (depends on service logic).
-     *
-     * @param id userID
-     * @param userRequestDTO DTO containing updated fields
-     * @return updated user data
-     */
+    // Update user info
     @PutMapping("{id}")
     public ResponseEntity<UserDTO> updateUser(@PathVariable int id, @RequestBody UserRequestDTO userRequestDTO){
         UserDTO updateUserDTO = userService.updateUser(id, userRequestDTO);
         return ResponseEntity.ok(updateUserDTO);
     }
 
-    /**
-     * PUT /api/users/{id}/role
-     * Update a user's role CUSTOMER -> ADMIN
-     * Only ADMIN users can update roles
-     *
-     * @param id userID
-     * @param updateRoleDTO  DTO with the new role
-     * @param bindingResult  validation result
-     * @return success message or validation errors
-     */
+    // Update user role CUSTOMER -> ADMIN or ADMIN -> CUSTOMER (Admin only)
     @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("{id}/role")
     public ResponseEntity<?> updateUserRole(@PathVariable int id, @Valid @RequestBody UpdateRoleDTO updateRoleDTO,
@@ -121,14 +86,7 @@ public class UserController
         }
     }
 
-    /**
-     * DELETE /api/users/{id}
-     * Delete a user by ID.
-     * Only ADMIN users can delete other users.
-     *
-     * @param id userID
-     * @return success message
-     */
+    // Delete user by ID (Admin only)
     @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("{id}")
     public ResponseEntity<Object> deleteUser(@PathVariable int id){

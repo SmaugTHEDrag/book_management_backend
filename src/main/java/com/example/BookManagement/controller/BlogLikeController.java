@@ -19,40 +19,20 @@ public class BlogLikeController {
     @Autowired
     private IBlogLikeService likeService; // Service layer handling blog like logic
 
-    /**
-     * GET /api/blogs/{blogId}/likes/count
-     * Get the total number of likes for a specific blog.
-     *
-     * @param blogId the ID of the blog
-     * @return the count of likes
-     */
+    // Get like count for a blog
     @GetMapping("/{blogId}/likes/count")
     public ResponseEntity<Long> getLikeCount(@PathVariable Integer blogId) {
         return ResponseEntity.ok(likeService.getLikeCount(blogId));
     }
 
-    /**
-     * GET /api/blogs/{blogId}/likes/has
-     * Checked if the authenticated user has liked a specific blog.
-     *
-     * @param blogId the ID of the blog
-     * @param principal the authenticated user
-     * @return true if the user has liked the blog, false otherwise
-     */
+    // Check if current user liked the blog
     @GetMapping("/{blogId}/likes/has")
     public ResponseEntity<Boolean> hasUserLiked(@PathVariable Integer blogId, Principal principal) {
         String username = principal.getName();
         return ResponseEntity.ok(likeService.hasUserLiked(blogId, username));
     }
 
-    /**
-     * POST /api/blogs/{blogId}/likes
-     * Like a blog. This operation is idempotent (liking multiple times does not duplicate).
-     *
-     * @param blogId the ID of the blog to like
-     * @param principal the authenticated user performing the like
-     * @return BlogLikeDTO representing the like action
-     */
+    // Like a blog (idempotent)
     @PostMapping("/{blogId}/likes")
     public ResponseEntity<BlogLikeDTO> likeBlog(@PathVariable Integer blogId, Principal principal) {
         String username = principal.getName();
@@ -60,14 +40,7 @@ public class BlogLikeController {
         return ResponseEntity.ok(dto);
     }
 
-    /**
-     * DELETE /api/blogs/{blogId}/likes
-     * Remove a like from a blog.
-     *
-     * @param blogId the ID of the blog to unlike
-     * @param principal the authenticated user performing the unlike
-     * @return ResponseEntity with no content
-     */
+    // Unlike a blog
     @DeleteMapping("/{blogId}/likes")
     public ResponseEntity<Void> unlikeBlog(@PathVariable Integer blogId, Principal principal) {
         String username = principal.getName();

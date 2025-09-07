@@ -7,10 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 /*
-* Repository interface for Blog Comment entity
-* Provide CRUD operations and custom queries for managing comments on blogs
-*
-* JpaRepository gives basic CRUD methods (save, findById, findAll, delete, etc.).
+ * Repository interface for Blog Comment entity
  */
 public interface IBlogCommentRepository extends JpaRepository<BlogComment, Integer> {
 

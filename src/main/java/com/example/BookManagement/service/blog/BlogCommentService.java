@@ -16,8 +16,8 @@ import java.util.Collections;
 import java.util.List;
 
 /*
- * Service implementation for managing blog comments.
- * Handles adding, updating, deleting, and retrieving comments, including nested replies.
+ * Service implementation for managing blog comments
+ * Handles adding, updating, deleting, and retrieving comments, including nested replies
  */
 @Service
 public class BlogCommentService implements IBlogCommentService {
@@ -34,13 +34,7 @@ public class BlogCommentService implements IBlogCommentService {
     @Autowired
     private ModelMapper modelMapper;
 
-    /*
-     * Map a BlogComment entity to BlogCommentDTO recursively.
-     * Includes nested replies.
-     *
-     * @param blogComment the comment entity
-     * @return BlogCommentDTO with comment details and nested replies
-     */
+    // Map a BlogComment entity to BlogCommentDTO recursively (includes nested replies)
     private BlogCommentDTO mapToCommentDTO(BlogComment blogComment) {
         BlogCommentDTO dto = modelMapper.map(blogComment, BlogCommentDTO.class);
         if (blogComment.getUser() != null) {
@@ -57,15 +51,7 @@ public class BlogCommentService implements IBlogCommentService {
         return dto;
     }
 
-    /*
-     * Add a comment to a blog post.
-     *
-     * @param blogId   ID of the blog to comment on
-     * @param request  DTO containing comment content, optional image, and optional parent comment ID
-     * @param username Username of the user adding the comment
-     * @return BlogCommentDTO of the created comment
-     * @throws RuntimeException if blog, user, or parent comment (if specified) is not found
-     */
+    // Add a comment to a blog post
     @Override
     public BlogCommentDTO addComment(Integer blogId, BlogCommentRequestDTO request, String username) {
         Blog blog = blogRepository.findById(blogId)
@@ -90,16 +76,8 @@ public class BlogCommentService implements IBlogCommentService {
         return mapToCommentDTO(saved);
     }
 
-    /*
-     * Update an existing comment.
-     * Only the comment owner is allowed to update.
-     *
-     * @param commentId ID of the comment to update
-     * @param request   DTO containing updated content and/or image
-     * @param username  Username of the comment owner
-     * @return BlogCommentDTO of the updated comment
-     * @throws RuntimeException if comment is not found or user is not authorized
-     */
+     // Update an existing comment
+     // Only the comment owner is allowed to update
     @Override
     public BlogCommentDTO updateComment(Integer commentId, BlogCommentRequestDTO request, String username) {
         BlogComment comment = commentRepository.findById(commentId)
@@ -112,14 +90,8 @@ public class BlogCommentService implements IBlogCommentService {
         return mapToCommentDTO(updated);
     }
 
-    /*
-     * Delete a comment.
-     * Only the comment owner is allowed to delete.
-     *
-     * @param commentId ID of the comment to delete
-     * @param username  Username of the comment owner
-     * @throws RuntimeException if comment is not found or user is not authorized
-     */
+
+    // Delete a comment by its ID
     @Override
     public void deleteComment(Integer commentId, String username) {
         BlogComment comment = commentRepository.findById(commentId)
@@ -127,20 +99,15 @@ public class BlogCommentService implements IBlogCommentService {
         commentRepository.delete(comment);
     }
 
-    /*
-     * Get all top-level comments for a specific blog post.
-     * Nested replies are included in the response.
-     *
-     * @param blogId ID of the blog
-     * @return List of BlogCommentDTOs for the blog
-     * @throws RuntimeException if blog is not found
-     */
+
+     // Get all top-level comments for a specific blog post
+     // Nested replies are included in the response.
     @Override
     public List<BlogCommentDTO> getCommentsByBlog(Integer blogId) {
         Blog blog = blogRepository.findById(blogId)
                 .orElseThrow(() -> new RuntimeException("Blog not found"));
 
-        // lấy chỉ top-level comments (parent = null) và Map trả về
+        // Get top-level comments (parent = null) and map to DTO
         return commentRepository.findAllByBlogAndParentCommentIsNull(blog)
                 .stream()
                 .map(this::mapToCommentDTO)

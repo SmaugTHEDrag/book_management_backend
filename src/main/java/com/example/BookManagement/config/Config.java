@@ -23,20 +23,12 @@ public class Config {
     public ModelMapper modelMapper() {
         ModelMapper modelMapper = new ModelMapper();
 
-        // ================================
-        // Custom mapping: Blog -> BlogDTO
-        // Map the 'username' field in BlogDTO from Blog.user.username
-        // This allows DTO to carry username directly instead of entire User object
-        // ================================
+        // Map Blog -> BlogDTO (username from Blog.user.username)
         modelMapper.typeMap(Blog.class, BlogDTO.class).addMappings(mapper ->
                 mapper.map(src -> src.getUser().getUsername(), BlogDTO::setUsername)
         );
 
-        // ================================
-        // Custom mapping: BlogComment -> BlogCommentDTO
-        // Map the 'username' field in BlogCommentDTO from BlogComment.user.username
-        // This ensures DTO contains the author's username without embedding full User entity
-        // ================================
+        // Map BlogComment -> BlogCommentDTO (username from BlogComment.user.username)
         modelMapper.typeMap(BlogComment.class, BlogCommentDTO.class).addMappings(mapper ->
                 mapper.map(src -> src.getUser().getUsername(), BlogCommentDTO::setUsername)
         );

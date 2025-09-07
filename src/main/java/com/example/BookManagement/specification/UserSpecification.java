@@ -13,12 +13,7 @@ import java.util.List;
  */
 public class UserSpecification {
 
-    /**
-     * Create a dynamic WHERE clause based on search filters from UserFilterForm.
-     *
-     * @param form The filter data (username, email, role, ID range).
-     * @return A Specification object for querying the database.
-     */
+    // Create a dynamic WHERE clause based on search filters from UserFilterForm.
     public static Specification<User> buildWhere(UserFilterForm form) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();

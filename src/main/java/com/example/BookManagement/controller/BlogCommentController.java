@@ -38,7 +38,7 @@ public class BlogCommentController {
     }
 
     // Update an existing comment (Comment owner only)
-    @PreAuthorize("@commentSecurity.canEdit(#id, authentication.name)")
+    @PreAuthorize("@commentSecurity.canEdit(#commentId, authentication.name)")
     @PutMapping("/comments/{commentId}")
     public ResponseEntity<BlogCommentDTO> updateComment(@PathVariable Integer commentId,
                                                         @RequestBody BlogCommentRequestDTO request,
@@ -48,7 +48,7 @@ public class BlogCommentController {
     }
 
     // Delete a comment (Blog owner, admin and Comment owner)
-    @PreAuthorize("hasAuthority('ADMIN') or @commentSecurity.canDelete(#id, authentication.name)")
+    @PreAuthorize("hasAuthority('ADMIN') or @commentSecurity.canDelete(#commentId, authentication.name)")
     @DeleteMapping("/comments/{commentId}")
     public ResponseEntity<Void> deleteComment(@PathVariable Integer commentId,
                                               Principal principal) {

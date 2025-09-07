@@ -49,8 +49,8 @@ public class BlogController {
         return ResponseEntity.ok(blogDTO);
     }
 
-    // Update blog (owner or admin only)
-    @PreAuthorize("hasAuthority('ADMIN') or @blogSecurity.isOwner(#id, principal.name)")
+    // Update blog (BLog owner only)
+    @PreAuthorize("@blogSecurity.isOwner(#id, authentication.name)")
     @PutMapping("/{id}")
     public ResponseEntity<BlogDTO> updateBlog(@PathVariable int id,
                                               @RequestBody BlogRequestDTO blogRequestDTO,
@@ -59,8 +59,8 @@ public class BlogController {
         return ResponseEntity.ok(blogDTO);
     }
 
-    // Delete blog (owner or admin only)
-    @PreAuthorize("hasAuthority('ADMIN') or @blogSecurity.isOwner(#id, principal.name)")
+    // Delete blog (Blog owner or admin only)
+    @PreAuthorize("hasAuthority('ADMIN') or @blogSecurity.isOwner(#id, authentication.name)")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBlog(@PathVariable int id,
                                            Principal principal) {

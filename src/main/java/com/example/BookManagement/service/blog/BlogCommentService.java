@@ -53,8 +53,8 @@ public class BlogCommentService implements IBlogCommentService {
 
     // Add a comment to a blog post
     @Override
-    public BlogCommentDTO addComment(Integer blogId, BlogCommentRequestDTO request, String username) {
-        Blog blog = blogRepository.findById(blogId)
+    public BlogCommentDTO addComment(BlogCommentRequestDTO request, String username) {
+        Blog blog = blogRepository.findById(request.getBlogId())
                 .orElseThrow(() -> new RuntimeException("Blog not found"));
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));

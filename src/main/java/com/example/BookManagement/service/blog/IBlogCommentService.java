@@ -16,7 +16,7 @@ public interface IBlogCommentService {
     List<BlogCommentDTO> getCommentsByBlog(Integer blogId);
 
     // Add a comment to a blog post
-    BlogCommentDTO addComment(Integer blogId, BlogCommentRequestDTO request, String username);
+    BlogCommentDTO addComment(BlogCommentRequestDTO request, String username);
 
     // Update a comment
     BlogCommentDTO updateComment(Integer commentId, BlogCommentRequestDTO request, String username);

@@ -31,14 +31,14 @@ public class BlogCommentController {
 
     // Add a new comment or reply to a blog.
     @PostMapping("/{blogId}/comments")
-    public ResponseEntity<BlogCommentDTO> addComment(@PathVariable Integer blogId, @RequestBody BlogCommentRequestDTO request,
+    public ResponseEntity<BlogCommentDTO> addComment(@RequestBody BlogCommentRequestDTO request,
                                                      Principal principal) {
         String username = principal.getName();
-        return ResponseEntity.ok(commentService.addComment(blogId, request, username));
+        return ResponseEntity.ok(commentService.addComment(request, username));
     }
 
-    // Update an existing comment. Only the comment author can update.
-    @PreAuthorize("@commentSecurity.canEdit(#id, principal.name)")
+    // Update an existing comment (Comment owner only)
+    @PreAuthorize("@commentSecurity.canEdit(#id, authentication.name)")
     @PutMapping("/comments/{commentId}")
     public ResponseEntity<BlogCommentDTO> updateComment(@PathVariable Integer commentId,
                                                         @RequestBody BlogCommentRequestDTO request,
@@ -47,8 +47,8 @@ public class BlogCommentController {
         return ResponseEntity.ok(commentService.updateComment(commentId, request, username));
     }
 
-    // Delete a comment. Only the comment author (or admin in service logic) can delete.
-    @PreAuthorize("hasAuthority('ADMIN') or @commentSecurity.canDelete(#id, principal.name)")
+    // Delete a comment (Blog owner, admin and Comment owner)
+    @PreAuthorize("hasAuthority('ADMIN') or @commentSecurity.canDelete(#id, authentication.name)")
     @DeleteMapping("/comments/{commentId}")
     public ResponseEntity<Void> deleteComment(@PathVariable Integer commentId,
                                               Principal principal) {

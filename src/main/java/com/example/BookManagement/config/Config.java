@@ -2,8 +2,10 @@ package com.example.BookManagement.config;
 
 import com.example.BookManagement.dto.blog.BlogDTO;
 import com.example.BookManagement.dto.blog.BlogCommentDTO;
+import com.example.BookManagement.dto.blog.BlogLikeDTO;
 import com.example.BookManagement.entity.Blog;
 import com.example.BookManagement.entity.BlogComment;
+import com.example.BookManagement.entity.BlogLike;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,6 +34,12 @@ public class Config {
         modelMapper.typeMap(BlogComment.class, BlogCommentDTO.class).addMappings(mapper ->
                 mapper.map(src -> src.getUser().getUsername(), BlogCommentDTO::setUsername)
         );
+
+        // Map BlogLike -> BlogLikeDTO
+        modelMapper.typeMap(BlogLike.class, BlogLikeDTO.class).addMappings(mapper -> {
+            mapper.map(src -> src.getBlog() != null ? src.getBlog().getId() : null, BlogLikeDTO::setBlogId);
+            mapper.map(src -> src.getUser() != null ? src.getUser().getUsername() : null, BlogLikeDTO::setUsername);
+        });
 
         return modelMapper;
     }

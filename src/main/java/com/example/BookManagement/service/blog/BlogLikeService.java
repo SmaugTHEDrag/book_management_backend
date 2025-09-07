@@ -43,7 +43,7 @@ public class BlogLikeService implements IBlogLikeService{
         // If already liked → return existing
         Optional<BlogLike> existing = likeRepository.findByBlogAndUser(blog, user);
         if (existing.isPresent()) {
-            return mapToDTO(existing.get());
+            return modelMapper.map(existing.get(), BlogLikeDTO.class);
         }
 
         BlogLike like = new BlogLike();
@@ -51,7 +51,7 @@ public class BlogLikeService implements IBlogLikeService{
         like.setUser(user);
 
         BlogLike saved = likeRepository.save(like);
-        return mapToDTO(saved);
+        return modelMapper.map(saved, BlogLikeDTO.class);
     }
 
 

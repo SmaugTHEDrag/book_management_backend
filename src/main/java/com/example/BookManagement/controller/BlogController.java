@@ -2,14 +2,16 @@ package com.example.BookManagement.controller;
 
 import com.example.BookManagement.dto.blog.BlogDTO;
 import com.example.BookManagement.dto.blog.BlogRequestDTO;
-import com.example.BookManagement.entity.Blog;
 import com.example.BookManagement.service.blog.IBlogService;
+import com.example.BookManagement.service.file.FileUploadService;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 import java.util.List;
@@ -29,6 +31,9 @@ public class BlogController {
     @Autowired
     private ModelMapper modelMapper;  // Used to map entities to DTOs
 
+    @Autowired
+    private FileUploadService fileUploadService;
+
     // Get all blogs
     @GetMapping
     public ResponseEntity<List<BlogDTO>> getAllBlogs() {
@@ -47,6 +52,39 @@ public class BlogController {
                                               Principal principal) {
         BlogDTO blogDTO = blogService.createBlog(blogRequestDTO, principal.getName());
         return ResponseEntity.ok(blogDTO);
+    }
+
+    // Upload a blog image integrate to Cloudinary
+    @PostMapping(value = "/upload", consumes = {"multipart/form-data"})
+    public ResponseEntity<BlogDTO> createBlogWithUpload(
+            // Text fields sent via multipart/form-data
+            @RequestPart("title") String title,
+            @RequestPart("content") String content,
+
+            // File uploads
+            @RequestPart(value = "image", required = false) MultipartFile image,
+            @RequestPart(value = "imageURL", required = false) String imageURL,
+            Principal principal
+    ) {
+        try {
+            // Upload image (if provided) to Cloudinary folder "blogs/images"
+            String uploadedImageUrl = null;
+            if (image != null && !image.isEmpty()) {
+                uploadedImageUrl = fileUploadService.uploadFile(image, "blogs/images");
+            } else if (imageURL != null && !imageURL.isBlank()) {
+                uploadedImageUrl = imageURL;
+            }
+
+            // Build DTO with URLs from Cloudinary
+            BlogRequestDTO dto = new BlogRequestDTO(title, content, uploadedImageUrl);
+
+            // Save blog to DB through service
+            BlogDTO created = blogService.createBlog(dto, principal.getName());
+            return new ResponseEntity<>(created, HttpStatus.CREATED);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     // Update blog (BLog owner only)

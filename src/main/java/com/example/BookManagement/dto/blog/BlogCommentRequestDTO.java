@@ -2,7 +2,9 @@ package com.example.BookManagement.dto.blog;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /*
  * Data Transfer Object (DTO) for creating a comment on a blog
@@ -10,6 +12,8 @@ import lombok.Data;
  * Validation ensures input data is correct before service processing
  */
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class BlogCommentRequestDTO {
 
     // ID of the blog to comment on

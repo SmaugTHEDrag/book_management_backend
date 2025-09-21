@@ -3,6 +3,8 @@ package com.example.BookManagement.controller;
 import com.example.BookManagement.dto.user.UserDTO;
 import com.example.BookManagement.form.RegisterForm;
 import com.example.BookManagement.service.auth.IAuthService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,21 +19,24 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
+/*
  * REST Controller responsible for user registration.
  * Accepts user registration requests, validates input,
  * and registers a new user in the system.
  */
 @RestController
 @RequestMapping("api")
+@Tag(name = "Auth API", description = "API for user authentication and registration")
 public class RegisterController {
+
     @Autowired
     private IAuthService userService; // Service layer to handle user registration logic
 
-    // Registers a new user.
+    // Registers a new user
+    @Operation(summary = "Register a new user", description = "Registers a new user with username, email, password, " +
+            "and other details.")
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterForm registerForm, BindingResult bindingResult) {
-
         // Check for validation errors
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = new HashMap<>();
@@ -40,7 +45,6 @@ public class RegisterController {
             }
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
         }
-
         try {
             // Attempt to register the user via service layer
             UserDTO createdUser = userService.register(registerForm);

@@ -7,6 +7,8 @@ import com.example.BookManagement.entity.Book;
 import com.example.BookManagement.form.BookFilterForm;
 import com.example.BookManagement.service.file.FileUploadService;
 import com.example.BookManagement.service.book.IBookService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +27,9 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @RestController
 @RequestMapping("api/books")
+@Tag(name = "Book API", description = "APIs for managing books")
 public class BookController {
+
     @Autowired
     private IBookService bookService;  // Service layer for book operations
 
@@ -36,12 +40,14 @@ public class BookController {
     private FileUploadService fileUploadService;
 
    // Get paginated books with optional filters
+    @Operation(summary = "Get all books", description = "Retrieve paginated books with optional filters")
     @GetMapping
     public ResponseEntity<BookPageResponse> getAllBooks(BookFilterForm form, @PageableDefault(page = 0, size = 9, sort = "id", direction = Sort.Direction.ASC) Pageable pageable){
         return ResponseEntity.ok(bookService.getAllBooks(form,pageable));
     }
 
-    // Get a single book by its ID.
+    // Get a single book by its ID
+    @Operation(summary = "Get book by ID", description = "Retrieve a single book by its ID")
     @GetMapping("{id}")
     public ResponseEntity<BookDTO> getBookById(@PathVariable int id){
         Book book = bookService.getBookById(id);
@@ -50,6 +56,7 @@ public class BookController {
     }
 
     // Create a new book (ADMIN only)
+    @Operation(summary = "Create book", description = "Create a new book (Admin only)")
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping
     public ResponseEntity<BookDTO> createBook(@RequestBody @Valid BookRequestDTO bookRequestDTO){
@@ -58,6 +65,7 @@ public class BookController {
     }
 
     // Upload a new book integrate to Cloudinary (ADMIN only)
+    @Operation(summary = "Upload book with files", description = "Upload a book with image and pdf to Cloudinary (Admin only)")
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping(value = "/upload", consumes = {"multipart/form-data"})
     public ResponseEntity<BookDTO> createBookWithUpload(
@@ -66,7 +74,6 @@ public class BookController {
             @RequestPart("author") String author,
             @RequestPart("category") String category,
             @RequestPart(value = "description", required = false) String description,
-
             // File uploads
             @RequestPart(value = "image", required = false) MultipartFile image,
             @RequestPart("pdf") MultipartFile pdf
@@ -74,13 +81,11 @@ public class BookController {
         try {
             // Upload PDF to Cloudinary folder "books/pdfs"
             String pdfUrl = fileUploadService.uploadFile(pdf, "books/pdfs");
-
             // Upload image (if provided) to Cloudinary folder "books/images"
             String imageUrl = null;
             if (image != null && !image.isEmpty()) {
                 imageUrl = fileUploadService.uploadFile(image, "books/images");
             }
-
             // Build DTO with URLs from Cloudinary
             BookRequestDTO dto = new BookRequestDTO(
                     title,
@@ -90,11 +95,9 @@ public class BookController {
                     description,
                     pdfUrl
             );
-
             // Save book to DB through service
             BookDTO created = bookService.createBook(dto);
             return new ResponseEntity<>(created, HttpStatus.CREATED);
-
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -102,6 +105,7 @@ public class BookController {
     }
 
     // Update a book (ADMIN only)
+    @Operation(summary = "Update book", description = "Update an existing book (Admin only)")
     @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("{id}")
     public ResponseEntity<BookDTO> updateBook(@PathVariable int id, @RequestBody @Valid BookRequestDTO bookRequestDTO){
@@ -110,6 +114,7 @@ public class BookController {
     }
 
     // Delete a book (ADMIN only)
+    @Operation(summary = "Delete book", description = "Delete a book by ID (Admin only)")
     @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("{id}")
     public ResponseEntity<Object> deleteBook(@PathVariable int id){

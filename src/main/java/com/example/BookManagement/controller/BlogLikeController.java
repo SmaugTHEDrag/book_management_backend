@@ -2,6 +2,8 @@ package com.example.BookManagement.controller;
 
 import com.example.BookManagement.dto.blog.BlogLikeDTO;
 import com.example.BookManagement.service.blog.IBlogLikeService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,17 +17,21 @@ import java.security.Principal;
  */
 @RestController
 @RequestMapping("/api/blogs")
+@Tag(name = "Blog Like API", description = "APIs for managing likes on blogs")
 public class BlogLikeController {
+
     @Autowired
     private IBlogLikeService likeService; // Service layer handling blog like logic
 
     // Get like count for a blog
+    @Operation(summary = "Get like count", description = "Returns the total number of likes for a specific blog")
     @GetMapping("/{blogId}/likes/count")
     public ResponseEntity<Long> getLikeCount(@PathVariable Integer blogId) {
         return ResponseEntity.ok(likeService.getLikeCount(blogId));
     }
 
     // Check if current user liked the blog
+    @Operation(summary = "Check user like", description = "Checks if the currently authenticated user has liked the blog")
     @GetMapping("/{blogId}/likes/has")
     public ResponseEntity<Boolean> hasUserLiked(@PathVariable Integer blogId, Principal principal) {
         String username = principal.getName();
@@ -33,6 +39,7 @@ public class BlogLikeController {
     }
 
     // Like a blog (idempotent)
+    @Operation(summary = "Like a blog", description = "Allows the currently authenticated user to like a blog (idempotent)")
     @PostMapping("/{blogId}/likes")
     public ResponseEntity<BlogLikeDTO> likeBlog(@PathVariable Integer blogId, Principal principal) {
         String username = principal.getName();
@@ -41,6 +48,7 @@ public class BlogLikeController {
     }
 
     // Unlike a blog
+    @Operation(summary = "Unlike a blog", description = "Allows the currently authenticated user to remove their like from a blog")
     @DeleteMapping("/{blogId}/likes")
     public ResponseEntity<Void> unlikeBlog(@PathVariable Integer blogId, Principal principal) {
         String username = principal.getName();

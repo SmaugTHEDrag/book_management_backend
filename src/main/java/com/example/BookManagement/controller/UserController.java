@@ -7,6 +7,8 @@ import com.example.BookManagement.dto.user.UserRequestDTO;
 import com.example.BookManagement.entity.User;
 import com.example.BookManagement.form.UserFilterForm;
 import com.example.BookManagement.service.user.IUserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +30,9 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("api/users")
-public class UserController
-{
+@Tag(name = "User API", description = "APIs for managing users and roles")
+public class UserController {
+
     @Autowired
     private IUserService userService; // Service layer for user operations
 
@@ -37,6 +40,7 @@ public class UserController
     private ModelMapper modelMapper;  // Maps entity objects to DTOs
 
     // Get all users with filters and pagination (Admin only)
+    @Operation(summary = "Get all users", description = "Retrieve all users with optional filters and pagination (Admin only)")
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping
     public ResponseEntity<UserPageResponse> getAllUsers(UserFilterForm form, @PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable pageable){
@@ -44,6 +48,7 @@ public class UserController
     }
 
     // Get user by ID
+    @Operation(summary = "Get user by ID", description = "Retrieve a single user by their ID")
     @GetMapping("{id}")
     public ResponseEntity<UserDTO> getUserById(@PathVariable int id){
         User user = userService.getUserById(id);
@@ -52,6 +57,7 @@ public class UserController
     }
 
     // Create a new user (Admin only)
+    @Operation(summary = "Create a new user", description = "Create a new user (Admin only)")
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping
     public ResponseEntity<UserDTO> createUser(@RequestBody @Valid UserRequestDTO userRequestDTO){
@@ -60,6 +66,7 @@ public class UserController
     }
 
     // Update user info
+    @Operation(summary = "Update user info", description = "Update user information by ID")
     @PutMapping("{id}")
     public ResponseEntity<UserDTO> updateUser(@PathVariable int id, @RequestBody UserRequestDTO userRequestDTO){
         UserDTO updateUserDTO = userService.updateUser(id, userRequestDTO);
@@ -67,6 +74,7 @@ public class UserController
     }
 
     // Update user role CUSTOMER -> ADMIN or ADMIN -> CUSTOMER (Admin only)
+    @Operation(summary = "Update user role", description = "Update user role between CUSTOMER and ADMIN (Admin only)")
     @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("{id}/role")
     public ResponseEntity<?> updateUserRole(@PathVariable int id, @Valid @RequestBody UpdateRoleDTO updateRoleDTO,
@@ -87,6 +95,7 @@ public class UserController
     }
 
     // Delete user by ID (Admin only)
+    @Operation(summary = "Delete user", description = "Delete a user by ID (Admin only)")
     @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("{id}")
     public ResponseEntity<Object> deleteUser(@PathVariable int id){

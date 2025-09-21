@@ -23,7 +23,7 @@ import org.springframework.context.annotation.Configuration;
         bearerFormat = "JWT"           // JWT format for bearer token
 )
 public class SwaggerConfig {
-    /**
+    /*
      * Configure the main OpenAPI bean.
      * Sets basic API info and global security requirement.
      */

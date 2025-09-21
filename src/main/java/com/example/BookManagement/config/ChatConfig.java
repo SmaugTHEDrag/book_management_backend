@@ -14,7 +14,7 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 public class ChatConfig {
     /*
-     * Bean for performing REST API calls.
+     * Bean for performing REST API calls
      * Used in services to call external APIs like Gemini or other HTTP endpoints.
      */
     @Bean
@@ -22,10 +22,7 @@ public class ChatConfig {
         return new RestTemplate();
     }
 
-    /**
-     * Bean for Jackson ObjectMapper.
-     * Configured to handle Java 8 Date/Time types properly and avoid timestamp serialization.
-     */
+    // Bean for Jackson ObjectMapper
     @Bean
     public ObjectMapper objectMapper() {
         ObjectMapper mapper = new ObjectMapper();

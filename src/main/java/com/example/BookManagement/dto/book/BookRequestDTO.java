@@ -3,7 +3,9 @@ package com.example.BookManagement.dto.book;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /*
  * Data Transfer Object (DTO) for creating or updating a book
@@ -11,6 +13,8 @@ import lombok.Data;
  * Validation ensures input data is correct before service processing
  */
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class BookRequestDTO {
 
     // Title of the book required length between 1 and 255 character

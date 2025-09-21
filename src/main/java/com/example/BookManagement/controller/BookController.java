@@ -5,6 +5,7 @@ import com.example.BookManagement.dto.book.BookPageResponse;
 import com.example.BookManagement.dto.book.BookRequestDTO;
 import com.example.BookManagement.entity.Book;
 import com.example.BookManagement.form.BookFilterForm;
+import com.example.BookManagement.service.file.FileUploadService;
 import com.example.BookManagement.service.book.IBookService;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
@@ -16,7 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.UriUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 /*
  * REST Controller for Book Management.
@@ -30,6 +31,9 @@ public class BookController {
 
     @Autowired
     private ModelMapper modelMapper;  // Maps entity objects to DTOs
+
+    @Autowired
+    private FileUploadService fileUploadService;
 
    // Get paginated books with optional filters
     @GetMapping
@@ -51,6 +55,50 @@ public class BookController {
     public ResponseEntity<BookDTO> createBook(@RequestBody @Valid BookRequestDTO bookRequestDTO){
         BookDTO createBookDTO = bookService.createBook(bookRequestDTO);
         return new ResponseEntity<>(createBookDTO,HttpStatus.CREATED);
+    }
+
+    // Upload a new book integrate to Cloudinary (ADMIN only)
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PostMapping(value = "/upload", consumes = {"multipart/form-data"})
+    public ResponseEntity<BookDTO> createBookWithUpload(
+            // Text fields sent via multipart/form-data
+            @RequestPart("title") String title,
+            @RequestPart("author") String author,
+            @RequestPart("category") String category,
+            @RequestPart(value = "description", required = false) String description,
+
+            // File uploads
+            @RequestPart(value = "image", required = false) MultipartFile image,
+            @RequestPart("pdf") MultipartFile pdf
+    ) {
+        try {
+            // Upload PDF to Cloudinary folder "books/pdfs"
+            String pdfUrl = fileUploadService.uploadFile(pdf, "books/pdfs");
+
+            // Upload image (if provided) to Cloudinary folder "books/images"
+            String imageUrl = null;
+            if (image != null && !image.isEmpty()) {
+                imageUrl = fileUploadService.uploadFile(image, "books/images");
+            }
+
+            // Build DTO with URLs from Cloudinary
+            BookRequestDTO dto = new BookRequestDTO(
+                    title,
+                    author,
+                    category,
+                    imageUrl,
+                    description,
+                    pdfUrl
+            );
+
+            // Save book to DB through service
+            BookDTO created = bookService.createBook(dto);
+            return new ResponseEntity<>(created, HttpStatus.CREATED);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     // Update a book (ADMIN only)

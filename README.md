@@ -13,7 +13,7 @@
 
 **[🌐 Live Demo](https://ptn-book-storage.netlify.app/)** •
 **[📖 API Docs](https://book-management-backend-d481.onrender.com/swagger-ui/index.html)** •
-**[🎥 Demo Video](#-demo-video)**
+**[🎥 Demo Video](https://www.youtube.com/watch?v=uis-1R07yUM)**
 
 </div>
 

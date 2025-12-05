@@ -10,11 +10,15 @@ import com.example.BookManagement.entity.User;
 import com.example.BookManagement.repository.IBlogRepository;
 import com.example.BookManagement.repository.IBookRepository;
 import com.example.BookManagement.repository.IUserRepository;
+import com.example.BookManagement.service.file.FileUploadService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -35,6 +39,9 @@ public class BlogService implements IBlogService{
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    private FileUploadService fileUploadService;
 
     // Convert BlogComment entity to DTO (includes nested replies)
     private BlogCommentDTO mapComment(BlogComment comment) {
@@ -139,5 +146,26 @@ public class BlogService implements IBlogService{
         Blog blog = blogRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Blog not found"));
         blogRepository.delete(blog);
+    }
+
+    @Override
+    public BlogDTO createBlogWithUpload(String title, String content, MultipartFile image, String imageURL, String username) {
+        try {
+            String uploadedImageUrl = null;
+            if(image != null && image.isEmpty()){
+                uploadedImageUrl = fileUploadService.uploadFile(image, "blogs/images");
+            } else if (imageURL != null && !imageURL.isBlank()){
+                uploadedImageUrl = imageURL;
+            }
+            // Build DTO
+            BlogRequestDTO dto = new BlogRequestDTO(title, content, uploadedImageUrl);
+
+            // Call blog method
+            return createBlog(dto, username);
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -36,9 +36,6 @@ public class BookController {
     @Autowired
     private ModelMapper modelMapper;  // Maps entity objects to DTOs
 
-    @Autowired
-    private FileUploadService fileUploadService;
-
    // Get paginated books with optional filters
     @Operation(summary = "Get all books", description = "Retrieve paginated books with optional filters")
     @GetMapping
@@ -78,30 +75,8 @@ public class BookController {
             @RequestPart(value = "image", required = false) MultipartFile image,
             @RequestPart("pdf") MultipartFile pdf
     ) {
-        try {
-            // Upload PDF to Cloudinary folder "books/pdfs"
-            String pdfUrl = fileUploadService.uploadFile(pdf, "books/pdfs");
-            // Upload image (if provided) to Cloudinary folder "books/images"
-            String imageUrl = null;
-            if (image != null && !image.isEmpty()) {
-                imageUrl = fileUploadService.uploadFile(image, "books/images");
-            }
-            // Build DTO with URLs from Cloudinary
-            BookRequestDTO dto = new BookRequestDTO(
-                    title,
-                    author,
-                    category,
-                    imageUrl,
-                    description,
-                    pdfUrl
-            );
-            // Save book to DB through service
-            BookDTO created = bookService.createBook(dto);
-            return new ResponseEntity<>(created, HttpStatus.CREATED);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+        BookDTO dto = bookService.createBookWithUpload(title, author, category, description, image, pdf);
+        return new ResponseEntity<>(dto, HttpStatus.CREATED);
     }
 
     // Update a book (ADMIN only)

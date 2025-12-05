@@ -34,9 +34,6 @@ public class BlogController {
     @Autowired
     private ModelMapper modelMapper;  // Used to map entities to DTOs
 
-    @Autowired
-    private FileUploadService fileUploadService;
-
     // Get all blogs
     @Operation(summary = "Get all blogs", description = "Retrieve a list of all blogs")
     @GetMapping
@@ -71,23 +68,8 @@ public class BlogController {
             @RequestPart(value = "imageURL", required = false) String imageURL,
             Principal principal
     ) {
-        try {
-            // Upload image (if provided) to Cloudinary folder "blogs/images"
-            String uploadedImageUrl = null;
-            if (image != null && !image.isEmpty()) {
-                uploadedImageUrl = fileUploadService.uploadFile(image, "blogs/images");
-            } else if (imageURL != null && !imageURL.isBlank()) {
-                uploadedImageUrl = imageURL;
-            }
-            // Build DTO with URLs from Cloudinary
-            BlogRequestDTO dto = new BlogRequestDTO(title, content, uploadedImageUrl);
-            // Save blog to DB through service
-            BlogDTO created = blogService.createBlog(dto, principal.getName());
-            return new ResponseEntity<>(created, HttpStatus.CREATED);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+        BlogDTO created = blogService.createBlogWithUpload(title, content, image, imageURL, principal.getName());
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     // Update blog (BLog owner only)

@@ -7,6 +7,7 @@ import com.example.BookManagement.entity.Book;
 import com.example.BookManagement.exception.ResourceNotFoundException;
 import com.example.BookManagement.form.BookFilterForm;
 import com.example.BookManagement.repository.IBookRepository;
+import com.example.BookManagement.service.file.FileUploadService;
 import com.example.BookManagement.specification.BookSpecification;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 /*
  * Service implementation for managing books
@@ -26,6 +30,9 @@ public class BookService implements IBookService {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    private FileUploadService fileUploadService;
 
     // Retrieves a paginated list of books based on filter criteria.
     @Override
@@ -91,6 +98,29 @@ public class BookService implements IBookService {
     @Override
     public void deleteBook(int id) {
         bookRepository.deleteById(id);
+    }
+
+    @Override
+    public BookDTO createBookWithUpload(String title, String author, String category, String description, MultipartFile image, MultipartFile pdf) {
+        try {
+            String pdfUrl = fileUploadService.uploadFile(pdf, "books/pdfs");
+            String imageUrl = null;
+            if (image != null && !image.isEmpty()) {
+                imageUrl = fileUploadService.uploadFile(image, "books/images");
+            }
+            BookRequestDTO dto = new BookRequestDTO(
+                    title,
+                    author,
+                    category,
+                    imageUrl,
+                    description,
+                    pdfUrl
+            );
+            return createBook(dto);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
 }

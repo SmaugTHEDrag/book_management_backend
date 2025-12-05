@@ -6,6 +6,7 @@ import com.example.BookManagement.dto.book.BookRequestDTO;
 import com.example.BookManagement.entity.Book;
 import com.example.BookManagement.form.BookFilterForm;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
 /*
  * Service interface for managing books
@@ -27,4 +28,8 @@ public interface IBookService {
 
     // Delete a book by its ID
     void deleteBook(int id);
+
+    // Upload a book with upload to Cloudinary
+    BookDTO createBookWithUpload(String title, String author, String category, String description,
+                                MultipartFile image, MultipartFile pdf);
 }

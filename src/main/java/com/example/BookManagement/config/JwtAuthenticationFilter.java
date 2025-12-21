@@ -1,13 +1,11 @@
 package com.example.BookManagement.config;
 
-import com.example.BookManagement.service.auth.IAuthService;
 import com.example.BookManagement.utils.JwtUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -22,7 +20,6 @@ import java.io.IOException;
  * Checks the Authorization header for a JWT token.
  * If valid, sets authentication in SecurityContext.
  */
-@Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -30,7 +27,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     // Main filter method executed for each HTTP request.
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException, ServletException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         // Extract JWT from Authorization header
         String jwt = getJwtFromHeader(request);
 
@@ -65,8 +62,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String authorization = request.getHeader("Authorization");
 
         // Check if header is present and starts with "Bearer "
-        if (authorization != null && authorization.startsWith("Bearer")) {
-            return authorization.replace("Bearer ", ""); // remove "Bearer " prefix
+        if (authorization != null && authorization.startsWith("Bearer ")) {
+            return authorization.substring(7).trim(); // remove "Bearer " prefix (7 characters)
         }
         return null; // No JWT found
     }

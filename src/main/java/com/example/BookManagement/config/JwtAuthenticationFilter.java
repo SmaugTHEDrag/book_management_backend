@@ -6,10 +6,12 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -21,9 +23,10 @@ import java.io.IOException;
  * If valid, sets authentication in SecurityContext.
  */
 @Component
+@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    @Autowired
-    private IAuthService userService;
+
+    private final UserDetailsService userDetailsService;
 
     // Main filter method executed for each HTTP request.
     @Override
@@ -38,17 +41,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             // Load user details using the username
             // Note: Cast assumes your IAuthService returns Spring Security UserDetails
-            User user = (User) userService.loadUserByUsername(username);
+            User user = (User) userDetailsService.loadUserByUsername(username);
 
             // Create authentication token with authorities
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(
-                            username,   // Principal
+                            user,   // Principal
                             null,      // Credentials are not needed here
                             user.getAuthorities() // Roles / authorities
                     );
             // Set the authentication in Spring Security context
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            if (SecurityContextHolder.getContext().getAuthentication() == null) {
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
         }
         // Continue filter chain
         filterChain.doFilter(request, response);

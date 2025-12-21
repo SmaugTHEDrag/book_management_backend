@@ -11,6 +11,9 @@ import com.example.BookManagement.repository.IBlogRepository;
 import com.example.BookManagement.repository.IBookRepository;
 import com.example.BookManagement.repository.IUserRepository;
 import com.example.BookManagement.service.file.FileUploadService;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,19 +32,18 @@ import java.util.stream.Collectors;
  * updating, and deleting blogs, as well as mapping comments and replies.
  */
 @Service
+@Transactional
+@RequiredArgsConstructor
+@Slf4j
 public class BlogService implements IBlogService{
 
-    @Autowired
-    private IBlogRepository blogRepository;
+    private final IBlogRepository blogRepository;
 
-    @Autowired
-    private IUserRepository userRepository;
+    private final IUserRepository userRepository;
 
-    @Autowired
-    private ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
 
-    @Autowired
-    private FileUploadService fileUploadService;
+    private final FileUploadService fileUploadService;
 
     // Convert BlogComment entity to DTO (includes nested replies)
     private BlogCommentDTO mapComment(BlogComment comment) {

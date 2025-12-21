@@ -6,6 +6,7 @@ import com.example.BookManagement.service.auth.IAuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,10 +28,10 @@ import java.util.Map;
 @RestController
 @RequestMapping("api")
 @Tag(name = "Auth API", description = "API for user authentication and registration")
+@RequiredArgsConstructor
 public class RegisterController {
 
-    @Autowired
-    private IAuthService userService; // Service layer to handle user registration logic
+    private final IAuthService userService; // Service layer to handle user registration logic
 
     // Registers a new user
     @Operation(summary = "Register a new user", description = "Registers a new user with username, email, password, " +

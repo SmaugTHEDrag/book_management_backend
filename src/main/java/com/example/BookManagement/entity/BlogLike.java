@@ -2,6 +2,9 @@ package com.example.BookManagement.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 
@@ -10,10 +13,12 @@ import java.time.LocalDateTime;
 * Each user can like a blog once only (enforced by unique constraints)
 */
 @Entity
-@Data
 @Table(name = "blog_like", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"blog_id", "user_id"})
 })
+@Getter
+@Setter
+@NoArgsConstructor
 public class BlogLike {
 
     @Id

@@ -5,7 +5,8 @@ import com.example.BookManagement.dto.blog.BlogCommentRequestDTO;
 import com.example.BookManagement.service.blog.IBlogCommentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -21,10 +22,10 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/blogs")
 @Tag(name = "Blog Comment API", description = "APIs for managing comments and replies on blogs")
+@RequiredArgsConstructor
 public class BlogCommentController {
 
-    @Autowired
-    private IBlogCommentService commentService;  // Service layer handling comment logic
+    private final IBlogCommentService commentService;  // Service layer handling comment logic
 
     // Get all comments (top-level + replies) for a blog
     @Operation(summary = "Get comments for a blog", description = "Returns all top-level and nested comments for a specific blog")
@@ -36,7 +37,7 @@ public class BlogCommentController {
     // Add a new comment or reply to a blog
     @Operation(summary = "Add a comment", description = "Adds a new comment or reply to a blog. If parentCommentId is provided in the request DTO, it creates a reply.")
     @PostMapping("/{blogId}/comments")
-    public ResponseEntity<BlogCommentDTO> addComment(@RequestBody BlogCommentRequestDTO request, Principal principal) {
+    public ResponseEntity<BlogCommentDTO> addComment(@RequestBody @Valid BlogCommentRequestDTO request, Principal principal) {
         String username = principal.getName();
         return ResponseEntity.ok(commentService.addComment(request, username));
     }
@@ -45,7 +46,7 @@ public class BlogCommentController {
     @Operation(summary = "Update comment", description = "Updates an existing comment. Only the comment owner can perform this action.")
     @PreAuthorize("@commentSecurity.canEdit(#commentId, authentication.name)")
     @PutMapping("/comments/{commentId}")
-    public ResponseEntity<BlogCommentDTO> updateComment(@PathVariable Integer commentId, @RequestBody BlogCommentRequestDTO request, Principal principal) {
+    public ResponseEntity<BlogCommentDTO> updateComment(@PathVariable Integer commentId, @RequestBody @Valid BlogCommentRequestDTO request, Principal principal) {
         String username = principal.getName();
         return ResponseEntity.ok(commentService.updateComment(commentId, request, username));
     }

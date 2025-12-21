@@ -1,5 +1,8 @@
 package com.example.BookManagement.service.chat;
 
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 /*
@@ -8,6 +11,9 @@ import org.springframework.stereotype.Service;
  * and can generate contextual prompts by including user messages
  */
 @Service
+@Transactional
+@RequiredArgsConstructor
+@Slf4j
 public class SystemPromptService {
     private static final String BOOK_ASSISTANT_SYSTEM_PROMPT = """
         You are a specialized Book Assistant chatbot created to help users discover and search for books in an online library system.

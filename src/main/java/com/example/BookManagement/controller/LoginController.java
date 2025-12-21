@@ -5,6 +5,8 @@ import com.example.BookManagement.form.LoginForm;
 import com.example.BookManagement.utils.JwtUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,16 +26,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("api/login")
 @Tag(name = "Auth API", description = "API for user authentication and login")
+@RequiredArgsConstructor
 public class LoginController {
 
-    @Autowired
-    private AuthenticationManager authenticationManager; // Spring Security's authentication manager
+    private final AuthenticationManager authenticationManager; // Spring Security's authentication manager
 
     // Authenticates the user using provided login credentials and returns a JWT token
     @Operation(summary = "User login",
             description = "Authenticates user credentials and returns a JWT token along with username and role.")
     @PostMapping
-    public ResponseEntity<Object> login(@RequestBody LoginForm loginForm) {
+    public ResponseEntity<Object> login(@RequestBody @Valid LoginForm loginForm) {
         // Authenticate the user
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginForm.getLogin(), loginForm.getPassword())

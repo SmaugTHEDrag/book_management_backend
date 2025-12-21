@@ -2,6 +2,9 @@ package com.example.BookManagement.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 
@@ -13,7 +16,9 @@ import java.time.LocalDateTime;
 @Table(name = "favorites", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"user_id", "book_id"})
 })
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 public class Favorite {
 
     @Id

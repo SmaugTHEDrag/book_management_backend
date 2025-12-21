@@ -9,6 +9,9 @@ import com.example.BookManagement.form.BookFilterForm;
 import com.example.BookManagement.repository.IBookRepository;
 import com.example.BookManagement.service.file.FileUploadService;
 import com.example.BookManagement.specification.BookSpecification;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -24,15 +27,16 @@ import java.io.IOException;
  * Handles business logic and interacts with the repository
  */
 @Service
+@Transactional
+@RequiredArgsConstructor
+@Slf4j
 public class BookService implements IBookService {
-    @Autowired
-    private IBookRepository bookRepository;
 
-    @Autowired
-    private ModelMapper modelMapper;
+    private final IBookRepository bookRepository;
 
-    @Autowired
-    private FileUploadService fileUploadService;
+    private final ModelMapper modelMapper;
+
+    private final FileUploadService fileUploadService;
 
     // Retrieves a paginated list of books based on filter criteria.
     @Override

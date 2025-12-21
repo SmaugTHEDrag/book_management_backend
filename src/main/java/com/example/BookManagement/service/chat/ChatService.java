@@ -4,6 +4,7 @@ import com.example.BookManagement.dto.chat.ChatRequest;
 import com.example.BookManagement.dto.chat.ChatResponse;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -21,6 +22,7 @@ import java.util.Map;
  * and processes responses for the frontend.
  */
 @Service
+@Transactional
 @Slf4j
 public class ChatService {
     @Value("${gemini.api.key}")

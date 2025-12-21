@@ -10,6 +10,7 @@ import com.example.BookManagement.service.book.IBookService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -28,13 +29,12 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("api/books")
 @Tag(name = "Book API", description = "APIs for managing books")
+@RequiredArgsConstructor
 public class BookController {
 
-    @Autowired
-    private IBookService bookService;  // Service layer for book operations
+    private final IBookService bookService;  // Service layer for book operations
 
-    @Autowired
-    private ModelMapper modelMapper;  // Maps entity objects to DTOs
+    private final ModelMapper modelMapper;  // Maps entity objects to DTOs
 
    // Get paginated books with optional filters
     @Operation(summary = "Get all books", description = "Retrieve paginated books with optional filters")

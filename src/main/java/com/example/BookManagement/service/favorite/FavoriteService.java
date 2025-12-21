@@ -9,6 +9,8 @@ import com.example.BookManagement.repository.IBookRepository;
 import com.example.BookManagement.repository.IFavoriteRepository;
 import com.example.BookManagement.repository.IUserRepository;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,19 +23,17 @@ import java.util.stream.Collectors;
  */
 @Service
 @Transactional
+@RequiredArgsConstructor
+@Slf4j
 public class FavoriteService implements IFavoriteService{
 
-    @Autowired
-    private IFavoriteRepository favoriteRepository;
+    private final IFavoriteRepository favoriteRepository;
 
-    @Autowired
-    private IUserRepository userRepository;
+    private final IUserRepository userRepository;
 
-    @Autowired
-    private IBookRepository bookRepository;
+    private final IBookRepository bookRepository;
 
-    @Autowired
-    private ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
 
     // Retrieves all favorite books of a user.
     @Override

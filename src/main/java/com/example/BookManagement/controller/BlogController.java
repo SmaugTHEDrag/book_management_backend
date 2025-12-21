@@ -3,12 +3,11 @@ package com.example.BookManagement.controller;
 import com.example.BookManagement.dto.blog.BlogDTO;
 import com.example.BookManagement.dto.blog.BlogRequestDTO;
 import com.example.BookManagement.service.blog.IBlogService;
-import com.example.BookManagement.service.file.FileUploadService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,13 +25,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/blogs")
 @Tag(name = "Blog API", description = "APIs for managing blogs")
+@RequiredArgsConstructor
 public class BlogController {
 
-    @Autowired
-    private IBlogService blogService;  // Service layer handling blog business logic
+    private final IBlogService blogService;  // Service layer handling blog business logic
 
-    @Autowired
-    private ModelMapper modelMapper;  // Used to map entities to DTOs
+    private final ModelMapper modelMapper;  // Used to map entities to DTOs
 
     // Get all blogs
     @Operation(summary = "Get all blogs", description = "Retrieve a list of all blogs")
@@ -76,7 +74,7 @@ public class BlogController {
     @Operation(summary = "Update a blog", description = "Update blog details (only owner can update)")
     @PreAuthorize("@blogSecurity.isOwner(#id, authentication.name)")
     @PutMapping("/{id}")
-    public ResponseEntity<BlogDTO> updateBlog(@PathVariable int id, @RequestBody BlogRequestDTO blogRequestDTO, Principal principal) {
+    public ResponseEntity<BlogDTO> updateBlog(@PathVariable int id, @RequestBody @Valid BlogRequestDTO blogRequestDTO, Principal principal) {
         BlogDTO blogDTO = blogService.updateBlog(id, blogRequestDTO, principal.getName());
         return ResponseEntity.ok(blogDTO);
     }

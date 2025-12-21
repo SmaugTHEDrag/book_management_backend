@@ -2,6 +2,9 @@ package com.example.BookManagement.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
@@ -13,7 +16,9 @@ import java.util.List;
 */
 @Entity
 @Table (name = "blogs")
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 public class Blog {
 
     @Id

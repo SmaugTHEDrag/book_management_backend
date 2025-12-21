@@ -8,6 +8,9 @@ import com.example.BookManagement.entity.User;
 import com.example.BookManagement.repository.IBlogCommentRepository;
 import com.example.BookManagement.repository.IBlogRepository;
 import com.example.BookManagement.repository.IUserRepository;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,19 +23,18 @@ import java.util.List;
  * Handles adding, updating, deleting, and retrieving comments, including nested replies
  */
 @Service
+@Transactional
+@RequiredArgsConstructor
+@Slf4j
 public class BlogCommentService implements IBlogCommentService {
 
-    @Autowired
-    private IBlogCommentRepository commentRepository;
+    private final IBlogCommentRepository commentRepository;
 
-    @Autowired
-    private IBlogRepository blogRepository;
+    private final IBlogRepository blogRepository;
 
-    @Autowired
-    private IUserRepository userRepository;
+    private final IUserRepository userRepository;
 
-    @Autowired
-    private ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
 
     // Map a BlogComment entity to BlogCommentDTO recursively (includes nested replies)
     private BlogCommentDTO mapToCommentDTO(BlogComment blogComment) {

@@ -4,6 +4,7 @@ import com.example.BookManagement.dto.blog.BlogLikeDTO;
 import com.example.BookManagement.service.blog.IBlogLikeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,10 +19,10 @@ import java.security.Principal;
 @RestController
 @RequestMapping("/api/blogs")
 @Tag(name = "Blog Like API", description = "APIs for managing likes on blogs")
+@RequiredArgsConstructor
 public class BlogLikeController {
 
-    @Autowired
-    private IBlogLikeService likeService; // Service layer handling blog like logic
+    private final IBlogLikeService likeService; // Service layer handling blog like logic
 
     // Get like count for a blog
     @Operation(summary = "Get like count", description = "Returns the total number of likes for a specific blog")

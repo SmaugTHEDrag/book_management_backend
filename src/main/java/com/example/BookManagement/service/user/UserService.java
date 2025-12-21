@@ -11,6 +11,8 @@ import com.example.BookManagement.form.UserFilterForm;
 import com.example.BookManagement.repository.IUserRepository;
 import com.example.BookManagement.specification.UserSpecification;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -26,12 +28,13 @@ import java.util.Optional;
  */
 @Service
 @Transactional
+@RequiredArgsConstructor
+@Slf4j
 public class UserService implements IUserService{
-    @Autowired
-    private IUserRepository userRepository;
 
-    @Autowired
-    private ModelMapper modelMapper;
+    private final IUserRepository userRepository;
+
+    private final ModelMapper modelMapper;
 
     // Retrieves all users based on filter form and pagination info
     @Override

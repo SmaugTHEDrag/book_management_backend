@@ -7,6 +7,9 @@ import com.example.BookManagement.entity.User;
 import com.example.BookManagement.repository.IBlogLikeRepository;
 import com.example.BookManagement.repository.IBlogRepository;
 import com.example.BookManagement.repository.IUserRepository;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,18 +21,18 @@ import java.util.Optional;
  * Handles logic for liking, unliking, and retrieving like information for blogs.
  */
 @Service
+@Transactional
+@RequiredArgsConstructor
+@Slf4j
 public class BlogLikeService implements IBlogLikeService{
-    @Autowired
-    private IBlogLikeRepository likeRepository;
 
-    @Autowired
-    private IBlogRepository blogRepository;
+    private final IBlogLikeRepository likeRepository;
 
-    @Autowired
-    private IUserRepository userRepository;
+    private final IBlogRepository blogRepository;
 
-    @Autowired
-    private ModelMapper modelMapper;
+    private final IUserRepository userRepository;
+
+    private final ModelMapper modelMapper;
 
     // Like a blog for the given user (idempotent: if the user already liked the blog, returns existing like)
     @Override

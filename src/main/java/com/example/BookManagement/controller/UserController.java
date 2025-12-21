@@ -10,6 +10,7 @@ import com.example.BookManagement.service.user.IUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -31,13 +32,12 @@ import java.util.Map;
 @RestController
 @RequestMapping("api/users")
 @Tag(name = "User API", description = "APIs for managing users and roles")
+@RequiredArgsConstructor
 public class UserController {
 
-    @Autowired
-    private IUserService userService; // Service layer for user operations
+    private final IUserService userService; // Service layer for user operations
 
-    @Autowired
-    private ModelMapper modelMapper;  // Maps entity objects to DTOs
+    private final ModelMapper modelMapper;  // Maps entity objects to DTOs
 
     // Get all users with filters and pagination (Admin only)
     @Operation(summary = "Get all users", description = "Retrieve all users with optional filters and pagination (Admin only)")
@@ -68,7 +68,7 @@ public class UserController {
     // Update user info
     @Operation(summary = "Update user info", description = "Update user information by ID")
     @PutMapping("{id}")
-    public ResponseEntity<UserDTO> updateUser(@PathVariable int id, @RequestBody UserRequestDTO userRequestDTO){
+    public ResponseEntity<UserDTO> updateUser(@PathVariable int id, @RequestBody @Valid UserRequestDTO userRequestDTO){
         UserDTO updateUserDTO = userService.updateUser(id, userRequestDTO);
         return ResponseEntity.ok(updateUserDTO);
     }

@@ -5,6 +5,9 @@ import com.example.BookManagement.entity.Role;
 import com.example.BookManagement.entity.User;
 import com.example.BookManagement.form.RegisterForm;
 import com.example.BookManagement.repository.IUserRepository;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -18,15 +21,16 @@ import org.springframework.stereotype.Service;
  * Handles user registration and login for Spring Security
  */
 @Service
+@Transactional
+@RequiredArgsConstructor
+@Slf4j
 public class AuthService implements IAuthService{
-    @Autowired
-    private IUserRepository userRepository;
 
-    @Autowired
-    private ModelMapper modelMapper;
+    private final IUserRepository userRepository;
 
-    @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
+    private final ModelMapper modelMapper;
+
+    private final BCryptPasswordEncoder passwordEncoder;
 
 
     // Registers a new user with validation for duplicate username/email (default role: CUSTOMER)

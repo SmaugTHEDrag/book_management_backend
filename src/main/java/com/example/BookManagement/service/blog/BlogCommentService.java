@@ -5,9 +5,11 @@ import com.example.BookManagement.dto.blog.BlogCommentRequestDTO;
 import com.example.BookManagement.entity.Blog;
 import com.example.BookManagement.entity.BlogComment;
 import com.example.BookManagement.entity.User;
+import com.example.BookManagement.mapper.BlogCommentMapper;
 import com.example.BookManagement.repository.IBlogCommentRepository;
 import com.example.BookManagement.repository.IBlogRepository;
 import com.example.BookManagement.repository.IUserRepository;
+import com.example.BookManagement.service.aimoderation.IAIModerationService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,11 +36,13 @@ public class BlogCommentService implements IBlogCommentService {
 
     private final IUserRepository userRepository;
 
-    private final ModelMapper modelMapper;
+    private final BlogCommentMapper blogCommentMapper;
+
+    private final IAIModerationService moderationService;
 
     // Map a BlogComment entity to BlogCommentDTO recursively (includes nested replies)
     private BlogCommentDTO mapToCommentDTO(BlogComment blogComment) {
-        BlogCommentDTO dto = modelMapper.map(blogComment, BlogCommentDTO.class);
+        BlogCommentDTO dto = blogCommentMapper.toDTO(blogComment);
         if (blogComment.getUser() != null) {
             dto.setUsername(blogComment.getUser().getUsername());
         }
@@ -64,7 +68,10 @@ public class BlogCommentService implements IBlogCommentService {
         BlogComment comment = new BlogComment();
         comment.setBlog(blog);
         comment.setUser(user);
-        comment.setContent(request.getContent());
+        if (request.getContent() != null && !request.getContent().isBlank()) {
+            moderationService.checkComment(comment.getContent());
+            comment.setContent(request.getContent());
+        }
         comment.setImage(request.getImage());
 
         if (request.getParentCommentId() != null) {
@@ -85,7 +92,10 @@ public class BlogCommentService implements IBlogCommentService {
         BlogComment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new RuntimeException("Comment not found"));
 
-        if (request.getContent() != null) comment.setContent(request.getContent());
+        if (request.getContent() != null && !request.getContent().isBlank()) {
+            moderationService.checkComment(comment.getContent());
+            comment.setContent(request.getContent());
+        }
         if (request.getImage() != null) comment.setImage(request.getImage());
 
         BlogComment updated = commentRepository.save(comment);

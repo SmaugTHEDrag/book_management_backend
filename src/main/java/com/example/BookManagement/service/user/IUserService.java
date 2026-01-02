@@ -18,7 +18,7 @@ public interface IUserService  {
     UserPageResponse getAllUsers(UserFilterForm form, Pageable pageable);
 
     // Get user details by ID
-    User getUserById(int id);
+    UserDTO getUserById(int id);
 
     // Create a new user
     UserDTO createUser(UserRequestDTO userRequestDTO);

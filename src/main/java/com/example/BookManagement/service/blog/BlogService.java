@@ -7,9 +7,12 @@ import com.example.BookManagement.entity.Blog;
 import com.example.BookManagement.entity.BlogComment;
 import com.example.BookManagement.entity.Role;
 import com.example.BookManagement.entity.User;
+import com.example.BookManagement.exception.ResourceNotFoundException;
+import com.example.BookManagement.mapper.BlogMapper;
 import com.example.BookManagement.repository.IBlogRepository;
 import com.example.BookManagement.repository.IBookRepository;
 import com.example.BookManagement.repository.IUserRepository;
+import com.example.BookManagement.service.aimoderation.IAIModerationService;
 import com.example.BookManagement.service.file.FileUploadService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -41,13 +44,15 @@ public class BlogService implements IBlogService{
 
     private final IUserRepository userRepository;
 
-    private final ModelMapper modelMapper;
+    private final BlogMapper blogMapper;
 
     private final FileUploadService fileUploadService;
 
+    private final IAIModerationService moderationService;
+
     // Convert BlogComment entity to DTO (includes nested replies)
     private BlogCommentDTO mapComment(BlogComment comment) {
-        BlogCommentDTO dto = modelMapper.map(comment, BlogCommentDTO.class);
+        BlogCommentDTO dto = blogMapper.toCommentDto(comment);
         dto.setUsername(comment.getUser().getUsername());
 
         // Map replies if available
@@ -64,7 +69,7 @@ public class BlogService implements IBlogService{
 
     // Convert Blog entity to DTO (includes top-level comments and like count)
     private BlogDTO mapBlogWithComments(Blog blog) {
-        BlogDTO dto = modelMapper.map(blog, BlogDTO.class);
+        BlogDTO dto = blogMapper.toDTO(blog);
 
         // Set like count
         dto.setLikeCount(blog.getBlogLikes() != null ? (long) blog.getBlogLikes().size() : 0);
@@ -94,7 +99,7 @@ public class BlogService implements IBlogService{
     @Override
     public BlogDTO getBlogById(int id) {
         Blog blog = blogRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Blog not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Blog not found"));
         return mapBlogWithComments(blog);
     }
 
@@ -103,7 +108,7 @@ public class BlogService implements IBlogService{
     @Override
     public BlogDTO createBlog(BlogRequestDTO blogRequestDTO, String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         // Basic validation
         if (blogRequestDTO.getTitle() == null || blogRequestDTO.getTitle().isBlank()) {
@@ -112,26 +117,29 @@ public class BlogService implements IBlogService{
         if (blogRequestDTO.getContent() == null || blogRequestDTO.getContent().isBlank()) {
             throw new IllegalArgumentException("Content is required");
         }
-
+        moderationService.checkComment(blogRequestDTO.getTitle());
+        moderationService.checkComment(blogRequestDTO.getContent());
         // Map DTO to entity
-        Blog blog = modelMapper.map(blogRequestDTO, Blog.class);
+        Blog blog = blogMapper.toEntity(blogRequestDTO);
         blog.setUser(user);
 
         Blog saved = blogRepository.save(blog);
-        return modelMapper.map(saved, BlogDTO.class);
+        return blogMapper.toDTO(saved);
     }
 
     // Update a blog
     @Override
     public BlogDTO updateBlog(int id, BlogRequestDTO blogRequestDTO, String username) {
         Blog blog = blogRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Blog not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Blog not found"));
 
         // Update only provided fields
         if (blogRequestDTO.getTitle() != null && !blogRequestDTO.getTitle().isBlank()) {
+            moderationService.checkComment(blogRequestDTO.getTitle());
             blog.setTitle(blogRequestDTO.getTitle());
         }
         if (blogRequestDTO.getContent() != null && !blogRequestDTO.getContent().isBlank()) {
+            moderationService.checkComment(blogRequestDTO.getContent());
             blog.setContent(blogRequestDTO.getContent());
         }
         if (blogRequestDTO.getImage() != null) {
@@ -139,7 +147,7 @@ public class BlogService implements IBlogService{
         }
 
         Blog updatedBlog = blogRepository.save(blog);
-        return modelMapper.map(updatedBlog, BlogDTO.class);
+        return blogMapper.toDTO(updatedBlog);
     }
 
     // Delete a blog post by its ID
@@ -154,7 +162,7 @@ public class BlogService implements IBlogService{
     public BlogDTO createBlogWithUpload(String title, String content, MultipartFile image, String imageURL, String username) {
         try {
             String uploadedImageUrl = null;
-            if(image != null && image.isEmpty()){
+            if(image != null && !image.isEmpty()){
                 uploadedImageUrl = fileUploadService.uploadFile(image, "blogs/images");
             } else if (imageURL != null && !imageURL.isBlank()){
                 uploadedImageUrl = imageURL;

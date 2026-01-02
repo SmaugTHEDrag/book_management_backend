@@ -22,19 +22,13 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-/*
- * REST Controller for Book Management.
- * Handles CRUD operations and retrieval of books.
- */
 @RestController
-@RequestMapping("api/books")
+@RequestMapping("/api/books")
 @Tag(name = "Book API", description = "APIs for managing books")
 @RequiredArgsConstructor
 public class BookController {
 
     private final IBookService bookService;  // Service layer for book operations
-
-    private final ModelMapper modelMapper;  // Maps entity objects to DTOs
 
    // Get paginated books with optional filters
     @Operation(summary = "Get all books", description = "Retrieve paginated books with optional filters")
@@ -47,9 +41,7 @@ public class BookController {
     @Operation(summary = "Get book by ID", description = "Retrieve a single book by its ID")
     @GetMapping("{id}")
     public ResponseEntity<BookDTO> getBookById(@PathVariable int id){
-        Book book = bookService.getBookById(id);
-        BookDTO bookDTO = modelMapper.map(book,BookDTO.class);
-        return ResponseEntity.ok(bookDTO);
+        return ResponseEntity.ok(bookService.getBookById(id));
     }
 
     // Create a new book (ADMIN only)

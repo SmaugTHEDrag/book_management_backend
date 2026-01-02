@@ -7,11 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/*
- * Data Transfer Object (DTO) for creating or updating a book
- * Receives input from client (request body) for book management operations
- * Validation ensures input data is correct before service processing
- */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

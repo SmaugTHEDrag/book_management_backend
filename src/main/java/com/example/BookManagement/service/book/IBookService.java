@@ -18,7 +18,7 @@ public interface IBookService {
     BookPageResponse getAllBooks(BookFilterForm form, Pageable pageable);
 
     // Find a book by its ID
-    Book getBookById(int id);
+    BookDTO getBookById(int id);
 
     // Create a new book
     BookDTO createBook(BookRequestDTO bookRequestDTO);

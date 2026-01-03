@@ -4,76 +4,59 @@ import lombok.Data;
 
 import java.util.List;
 
-/*
- * Data Transfer Object (DTO) representing a chat request
- * This object is sent from the client to the backend for processing chat messages
- * including message history and optional file attachments
- */
 @Data
 public class ChatRequest {
 
-    // The current message from the user
+    // current user message
     private String message;
 
-    // List of past chat messages for conversation context
+    // previous messages for conversation context
     private List<ChatHistory> chatHistory;
 
-    // Optional file data sent along with the message
+    // optional file attached with the message
     private FileData fileData;
 
-    /*
-     * Represents a single chat history entry
-     * Each history contains a role (user or model) and a list of message part
-     */
+    // represents a single message in the conversation history
     @Data
     public static class ChatHistory {
 
-        // Role of the message sender - USER or MODEL
+        // sender role: USER or MODEL
         private String role;
 
-        // The list of parts (text or inline data) that make up this message
+        // message content (can be text or inline data)
         private List<Part> parts;
 
-        /*
-         * Represents a part of a message
-         *  A part can contain plain text or inline binary data
-         */
+        // a part of a message
         @Data
         public static class Part {
 
-            // The text content of this part
+            // text content
             private String text;
 
-            // Inline binary data
+            // inline binary data (image, pdf, ...)
             private InlineData inline_data;
         }
 
-        /*
-         * Represents inline binary data within a message
-         * Typically used for sending images or documents
-         */
+        // inline binary data inside a message
         @Data
         public static class InlineData {
 
-            // MINE type of data (image/png, application/pdf)
+            // mime type (image/png, application/pdf, ...)
             private String mime_type;
 
-            // Base64 encoded binary data
+            // base64 encoded data
             private String data;
         }
     }
 
-    /*
-     * Represents file data attached to the chat request
-     * Used for sending entire files along with the current message
-     */
+    // file attached to the current chat request
     @Data
     public static class FileData {
 
-        // MINE type of the attached file
+        // mime type of the file
         private String mime_type;
 
-        // Base64 encoded file data
+        // base64 encoded file data
         private String data;
     }
 }

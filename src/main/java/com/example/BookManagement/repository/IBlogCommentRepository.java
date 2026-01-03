@@ -6,9 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-/*
- * Repository interface for Blog Comment entity
- */
 public interface IBlogCommentRepository extends JpaRepository<BlogComment, Integer> {
 
     // Get all top-level comment (comment without parent comment) for a specific blog

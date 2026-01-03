@@ -5,9 +5,6 @@ import com.example.BookManagement.dto.favorite.FavoriteRequestDTO;
 
 import java.util.List;
 
-/*
- * Service interface for managing user favorite books.
- */
 public interface IFavoriteService {
 
     // Get all favorite books of a user

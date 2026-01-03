@@ -10,36 +10,31 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 
-/*
- * REST Controller for managing likes on blogs.
- * Provides endpoints to like, unlike, count likes, and check if a user has liked a blog.
- * Requires authentication for user-specific actions.
- */
 @RestController
 @RequestMapping("/api/blogs")
-@Tag(name = "Blog Like API", description = "APIs for managing likes on blogs")
+@Tag(name = "Blog Like API", description = "APIs for blog likes")
 @RequiredArgsConstructor
 public class BlogLikeController {
 
-    private final IBlogLikeService likeService; // Service layer handling blog like logic
+    private final IBlogLikeService likeService;
 
-    // Get like count for a blog
-    @Operation(summary = "Get like count", description = "Returns the total number of likes for a specific blog")
+    // get total like for a blog
+    @Operation(summary = "Get like count")
     @GetMapping("/{blogId}/likes/count")
     public ResponseEntity<Long> getLikeCount(@PathVariable Integer blogId) {
         return ResponseEntity.ok(likeService.getLikeCount(blogId));
     }
 
-    // Check if current user liked the blog
-    @Operation(summary = "Check user like", description = "Checks if the currently authenticated user has liked the blog")
+    // check if current user liked the blog
+    @Operation(summary = "Check user like")
     @GetMapping("/{blogId}/likes/has")
     public ResponseEntity<Boolean> hasUserLiked(@PathVariable Integer blogId, Principal principal) {
         String username = principal.getName();
         return ResponseEntity.ok(likeService.hasUserLiked(blogId, username));
     }
 
-    // Like a blog (idempotent)
-    @Operation(summary = "Like a blog", description = "Allows the currently authenticated user to like a blog (idempotent)")
+    // like a blog (idempotent)
+    @Operation(summary = "Like a blog")
     @PostMapping("/{blogId}/likes")
     public ResponseEntity<BlogLikeDTO> likeBlog(@PathVariable Integer blogId, Principal principal) {
         String username = principal.getName();
@@ -48,7 +43,7 @@ public class BlogLikeController {
     }
 
     // Unlike a blog
-    @Operation(summary = "Unlike a blog", description = "Allows the currently authenticated user to remove their like from a blog")
+    @Operation(summary = "Unlike a blog")
     @DeleteMapping("/{blogId}/likes")
     public ResponseEntity<Void> unlikeBlog(@PathVariable Integer blogId, Principal principal) {
         String username = principal.getName();

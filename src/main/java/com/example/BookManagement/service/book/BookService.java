@@ -24,10 +24,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 
-/*
- * Service implementation for managing books
- * Handles business logic and interacts with the repository
- */
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -44,34 +40,39 @@ public class BookService implements IBookService {
 
     private final ReviewMapper reviewMapper;
 
+    // Map Book entity to DTO with rating & reviews
     private BookDTO mapToBookDTOWithRating(Book book) {
         BookDTO dto = bookMapper.toDTO(book);
 
+        // Average rating
         Double avgRating = reviewRepository.findAvgRatingByBookId(book.getId());
         dto.setAvgRating(avgRating != null ? avgRating : 0.0);
 
+        // Total reviews
         Integer reviewCount = reviewRepository.getReviewCountByBookId(book.getId());
         dto.setReviewCount(reviewCount !=null ? reviewCount:0);
 
-        List<Review> reviews = reviewRepository.findByBookIdWithUser(book.getId()); // query join fetch user
+        // Reviews with user info
+        List<Review> reviews = reviewRepository.findByBookIdWithUser(book.getId());
         dto.setReviews(reviewMapper.toListDTO(reviews));
 
         return dto;
     }
 
-    // Retrieves a paginated list of books based on filter criteria.
+    // Get paginated books with filters
     @Override
     public BookPageResponse getAllBooks(BookFilterForm form, Pageable pageable) {
+
         // Build search/filter conditions
         Specification<Book> where = BookSpecification.buildWhere(form);
 
-        // Get paginated books from database
+        // Query with pagination
         Page<Book> books = bookRepository.findAll(where, pageable);
 
-        // Convert Book entities to BookDTOs
+        // Map entities to DTOs
         Page<BookDTO> bookDTOs = books.map(this::mapToBookDTOWithRating);
 
-        // Return a page response with metadata
+        // Wrap pagination metadata
         return new BookPageResponse(
             bookDTOs.getContent(),
             bookDTOs.getNumber(),
@@ -83,7 +84,7 @@ public class BookService implements IBookService {
         );
     }
 
-    // Retrieves a book by its ID
+    // Get a book by ID
     @Override
     public BookDTO getBookById(int id) {
         Book book = bookRepository.findById(id)
@@ -91,57 +92,58 @@ public class BookService implements IBookService {
 
         BookDTO dto = bookMapper.toDTO(book);
 
+        // Rating summary
         Double avgRating = reviewRepository.findAvgRatingByBookId(id);
         dto.setAvgRating(avgRating != null ? avgRating : 0.0);
+
         Integer reviewCount = reviewRepository.getReviewCountByBookId(id);
         dto.setReviewCount(reviewCount !=null ? reviewCount:0);
+
         return dto;
     }
 
 
-    // Creates a new book entry
+    // Creates a new book
     @Override
     public BookDTO createBook(BookRequestDTO bookRequestDTO) {
-        // Map request DTO to entity
         Book book = bookMapper.toEntity(bookRequestDTO);
-        // Save to database
         Book savedBook = bookRepository.save(book);
-
-        // Convert to DTO and return
         return bookMapper.toDTO(savedBook);
     }
 
     // Updates an existing book
     @Override
     public BookDTO updateBook(int id, BookRequestDTO bookRequestDTO) {
-        // Find existing book
         Book existingBook = bookRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Book not found with id: " + id));
 
-        // Update fields manually
+        // Apply changes from DTO
         bookMapper.updateEntityFromDTO(bookRequestDTO, existingBook);
 
-        // Save updated book
         Book updatedBook = bookRepository.save(existingBook);
-
-        // Convert to DTO and return
         return bookMapper.toDTO(updatedBook);
     }
 
-    // Deletes a book by its ID
+    // Deletes a book by ID
     @Override
     public void deleteBook(int id) {
         bookRepository.deleteById(id);
     }
 
+    // Create book with file upload (image + pdf)
     @Override
     public BookDTO createBookWithUpload(String title, String author, String category, String description, MultipartFile image, MultipartFile pdf) {
         try {
+            // Upload PDF
             String pdfUrl = fileUploadService.uploadFile(pdf, "books/pdfs");
+
+            // Upload image if provided
             String imageUrl = null;
             if (image != null && !image.isEmpty()) {
                 imageUrl = fileUploadService.uploadFile(image, "books/images");
             }
+
+            // Build request DTO
             BookRequestDTO dto = new BookRequestDTO(
                     title,
                     author,
@@ -154,7 +156,6 @@ public class BookService implements IBookService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
     }
 
 }

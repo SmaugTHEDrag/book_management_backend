@@ -30,22 +30,22 @@ public class BookController {
 
     private final IBookService bookService;  // Service layer for book operations
 
-   // Get paginated books with optional filters
-    @Operation(summary = "Get all books", description = "Retrieve paginated books with optional filters")
+    // get paginated books with optional filters
+    @Operation(summary = "Get all books")
     @GetMapping
     public ResponseEntity<BookPageResponse> getAllBooks(BookFilterForm form, @PageableDefault(page = 0, size = 9, sort = "id", direction = Sort.Direction.ASC) Pageable pageable){
         return ResponseEntity.ok(bookService.getAllBooks(form,pageable));
     }
 
-    // Get a single book by its ID
-    @Operation(summary = "Get book by ID", description = "Retrieve a single book by its ID")
+    // get a book by ID
+    @Operation(summary = "Get book by ID")
     @GetMapping("{id}")
     public ResponseEntity<BookDTO> getBookById(@PathVariable int id){
         return ResponseEntity.ok(bookService.getBookById(id));
     }
 
-    // Create a new book (ADMIN only)
-    @Operation(summary = "Create book", description = "Create a new book (Admin only)")
+    // create a new book (ADMIN only) (no image)
+    @Operation(summary = "Create book")
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping
     public ResponseEntity<BookDTO> createBook(@RequestBody @Valid BookRequestDTO bookRequestDTO){
@@ -53,8 +53,8 @@ public class BookController {
         return new ResponseEntity<>(createBookDTO,HttpStatus.CREATED);
     }
 
-    // Upload a new book integrate to Cloudinary (ADMIN only)
-    @Operation(summary = "Upload book with files", description = "Upload a book with image and pdf to Cloudinary (Admin only)")
+    // create book with image/file (Cloudinary)
+    @Operation(summary = "Upload book with files")
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping(value = "/upload", consumes = {"multipart/form-data"})
     public ResponseEntity<BookDTO> createBookWithUpload(
@@ -71,7 +71,7 @@ public class BookController {
         return new ResponseEntity<>(dto, HttpStatus.CREATED);
     }
 
-    // Update a book (ADMIN only)
+    // update a book (ADMIN only)
     @Operation(summary = "Update book", description = "Update an existing book (Admin only)")
     @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("{id}")
@@ -80,7 +80,7 @@ public class BookController {
         return ResponseEntity.ok(updateBookDTO);
     }
 
-    // Delete a book (ADMIN only)
+    // delete a book (ADMIN only)
     @Operation(summary = "Delete book", description = "Delete a book by ID (Admin only)")
     @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("{id}")

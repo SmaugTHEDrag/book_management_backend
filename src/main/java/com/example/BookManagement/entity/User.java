@@ -10,10 +10,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/*
-* Entity of user (ADMIN or CUSTOMER)
-* User can have lots of favorites books, blogs, blog likes and blog comments;
-*/
 @Entity
 @Table(name = "users")
 @Getter
@@ -23,16 +19,16 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;  // Auto-generated primary key
+    private Integer id;
 
     @Column(nullable = false, unique = true, length = 50)
-    private String username;   // Unique username
+    private String username;
 
     @Column(nullable = false)
-    private String password; // Encrypted password
+    private String password;
 
     @Column(nullable = false, unique = true)
-    private String email;  // Unique email address
+    private String email;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -40,13 +36,11 @@ public class User {
 
     @Column(name = "created_at")
     @CreationTimestamp
-    private LocalDateTime createdAt;  // Timestamp of user creation
+    private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
     @UpdateTimestamp
-    private LocalDateTime updatedAt; // Timestamp of user last update
-
-    // ---- RELATIONSHIP ----
+    private LocalDateTime updatedAt;
 
     // One user can have many favorites;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -63,4 +57,8 @@ public class User {
     // One user can comment on many blogs;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BlogComment> blogComments;
+
+    // One user can comment on many reviews;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Review> reviews;
 }

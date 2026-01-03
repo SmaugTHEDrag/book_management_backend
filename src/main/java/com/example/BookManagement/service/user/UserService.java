@@ -8,6 +8,7 @@ import com.example.BookManagement.entity.Role;
 import com.example.BookManagement.entity.User;
 import com.example.BookManagement.exception.ResourceNotFoundException;
 import com.example.BookManagement.form.UserFilterForm;
+import com.example.BookManagement.mapper.UserMapper;
 import com.example.BookManagement.repository.IUserRepository;
 import com.example.BookManagement.specification.UserSpecification;
 import jakarta.transaction.Transactional;
@@ -22,10 +23,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-/*
- * Service implementation for managing user-related operations
- * Defines the operations that the Book service must implement
- */
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -34,16 +31,15 @@ public class UserService implements IUserService{
 
     private final IUserRepository userRepository;
 
-    private final ModelMapper modelMapper;
+    private final UserMapper userMapper;
 
-    // Retrieves all users based on filter form and pagination info
+    // Get users with pagination and filter
     @Override
     public UserPageResponse getAllUsers(UserFilterForm form, Pageable pageable) {
         Specification<User> where = UserSpecification.buildWhere(form);
         Page<User> users = userRepository.findAll(where,pageable);
-        Page<UserDTO> userDTOS = users.map(user -> modelMapper.map(user, UserDTO.class));
+        Page<UserDTO> userDTOS = users.map(userMapper::toDTO);
 
-        //Build response
         return new UserPageResponse(
                 userDTOS.getContent(),
                 userDTOS.getNumber(),
@@ -55,43 +51,43 @@ public class UserService implements IUserService{
         );
     }
 
-    // Finds a user by their ID
+    // Get a user by ID
     @Override
-    public User getUserById(int id) {
-        return userRepository.findById(id).orElse(null);
+    public UserDTO getUserById(int id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(()-> new ResourceNotFoundException("User not found"));
+
+        return userMapper.toDTO(user);
     }
 
-    // Creates a new user.
+    // Creates new user.
     @Override
     public UserDTO createUser(UserRequestDTO userRequestDTO) {
-        User user = modelMapper.map(userRequestDTO, User.class);
-        // Store
+        User user = userMapper.toEntity(userRequestDTO);
         User savedUser = userRepository.save(user);
-        // Return DTO
-        return modelMapper.map(savedUser, UserDTO.class);
+
+        return userMapper.toDTO(savedUser);
     }
 
-    // Updates an existing user by ID
+    // Update user information
     @Override
     public UserDTO updateUser(int id, UserRequestDTO userRequestDTO) {
-        // Check if user exist
         User existingUser = userRepository.findById(id)
                 .orElseThrow(()-> new ResourceNotFoundException("User not found with id: "+id));
-        // Map new data from DTO to entity
-        modelMapper.map(userRequestDTO, existingUser);
-        // Store it
+
+        userMapper.updateEntityFromDTO(userRequestDTO, existingUser);
         User updatedUser = userRepository.save(existingUser);
-        // Return DTO
-        return modelMapper.map(updatedUser, UserDTO.class);
+
+        return userMapper.toDTO(updatedUser);
     }
 
-    // Deletes a user by ID
+    // Deletes user by ID
     @Override
     public void deleteUser(int id) {
         userRepository.deleteById(id);
     }
 
-    // Updates the role of a user
+    // Update user role
     @Override
     public void updateUserRole(int id, UpdateRoleDTO updateRoleDTO) {
         Optional<User> optionalUser = userRepository.findById(id);

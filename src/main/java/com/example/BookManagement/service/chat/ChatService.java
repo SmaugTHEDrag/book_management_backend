@@ -16,11 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Service for interacting with Gemini Generative Language API.
- * Builds request payloads (system prompt, messages, history, files)
- * and processes responses for the frontend.
- */
 @Service
 @Transactional
 @Slf4j

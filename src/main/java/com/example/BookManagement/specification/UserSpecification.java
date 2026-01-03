@@ -8,27 +8,26 @@ import org.springframework.data.jpa.domain.Specification;
 import java.util.ArrayList;
 import java.util.List;
 
-/*
- * Builds dynamic filtering conditions for User records.
- */
 public class UserSpecification {
 
-    // Create a dynamic WHERE clause based on search filters from UserFilterForm.
+    // Build dynamic query based on filter conditions
     public static Specification<User> buildWhere(UserFilterForm form) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            // Search by username
+            // Filter by username
             if(form.getUsernameSearch() != null && !form.getUsernameSearch().isEmpty()){
                 String value = "%" + form.getUsernameSearch().toLowerCase() + "%";
                 predicates.add(criteriaBuilder.like(root.get("username"), value));
             }
-            // Search by email
+
+            // Filter by email
             if(form.getEmailSearch() != null && !form.getEmailSearch().isEmpty()){
                 String value = "%" + form.getEmailSearch().toLowerCase() + "%";
                 predicates.add(criteriaBuilder.like(root.get("email"), value));
             }
-            // Search by role
+
+            // Filter by role
             if(form.getRoleSearch() != null && !form.getRoleSearch().isEmpty()){
                 String value = "%" + form.getRoleSearch().toLowerCase() + "%";
                 predicates.add(criteriaBuilder.like(root.get("role"), value));

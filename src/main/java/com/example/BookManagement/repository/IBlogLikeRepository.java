@@ -8,9 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.Optional;
 
-/*
- * Repository interface for Blog Like entity
- */
 public interface IBlogLikeRepository extends JpaRepository<BlogLike, Integer> {
 
     // Find a like on blog and by user

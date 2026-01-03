@@ -6,9 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.Optional;
 
-/*
- * Repository interface for Favorite entity
- */
 public interface IFavoriteRepository extends JpaRepository<Favorite, Integer> {
 
     // Get all favorite books of specific user

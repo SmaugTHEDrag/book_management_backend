@@ -7,21 +7,16 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-/*
- * Service interface for managing blogs
- * Defines methods for creating, updating, retrieving, and deleting blogs
- */
 public interface IBlogService {
 
-    // Get a list of all blogs
+    // Get all blogs
     List<BlogDTO> getAllBlogs();
 
-    // Get details of a specific blog by ID
+    // Get blog by ID
     BlogDTO getBlogById(int id);
 
-    // Create a new blog for the given user
+    // Create a new blog (no image)
     BlogDTO createBlog(BlogRequestDTO requestDTO, String username);
-
 
     // Update an existing blog
     BlogDTO updateBlog(int id, BlogRequestDTO requestDTO, String username);

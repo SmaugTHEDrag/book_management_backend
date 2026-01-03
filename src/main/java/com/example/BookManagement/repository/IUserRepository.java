@@ -7,9 +7,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import java.util.List;
 import java.util.Optional;
 
-/*
- * Repository interface for User entity
- */
 public interface IUserRepository extends JpaRepository<User, Integer>, JpaSpecificationExecutor<User> {
 
     // Find a user by their username

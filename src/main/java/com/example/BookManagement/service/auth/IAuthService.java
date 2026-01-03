@@ -6,15 +6,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
-/*
- * Authentication service interface
- * Defines methods for user registration and login
- */
 public interface IAuthService extends UserDetailsService {
 
     // Register a new user
     UserDTO register(RegisterForm registerForm);
-
-    // Load user details by username (use by Spring Security for login)
-    UserDetails loadUserByUsername(String login) throws UsernameNotFoundException;
+    
 }

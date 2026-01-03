@@ -5,35 +5,23 @@ import com.example.BookManagement.dto.blog.BlogDTO;
 import com.example.BookManagement.dto.blog.BlogRequestDTO;
 import com.example.BookManagement.entity.Blog;
 import com.example.BookManagement.entity.BlogComment;
-import com.example.BookManagement.entity.Role;
 import com.example.BookManagement.entity.User;
 import com.example.BookManagement.exception.ResourceNotFoundException;
 import com.example.BookManagement.mapper.BlogMapper;
 import com.example.BookManagement.repository.IBlogRepository;
-import com.example.BookManagement.repository.IBookRepository;
 import com.example.BookManagement.repository.IUserRepository;
 import com.example.BookManagement.service.aimoderation.IAIModerationService;
 import com.example.BookManagement.service.file.FileUploadService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/*
- * Service implementation for managing blogs
- * updating, and deleting blogs, as well as mapping comments and replies.
- */
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -95,7 +83,7 @@ public class BlogService implements IBlogService{
                 .collect(Collectors.toList());
     }
 
-    // Get a single blog by its ID.
+    // Get a blog by ID.
     @Override
     public BlogDTO getBlogById(int id) {
         Blog blog = blogRepository.findById(id)
@@ -104,22 +92,22 @@ public class BlogService implements IBlogService{
     }
 
 
-    // Create a new blog post.
+    // Create a new blog post (no image)
     @Override
     public BlogDTO createBlog(BlogRequestDTO blogRequestDTO, String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        // Basic validation
         if (blogRequestDTO.getTitle() == null || blogRequestDTO.getTitle().isBlank()) {
             throw new IllegalArgumentException("Title is required");
         }
+
         if (blogRequestDTO.getContent() == null || blogRequestDTO.getContent().isBlank()) {
             throw new IllegalArgumentException("Content is required");
         }
+
         moderationService.checkComment(blogRequestDTO.getTitle());
         moderationService.checkComment(blogRequestDTO.getContent());
-        // Map DTO to entity
         Blog blog = blogMapper.toEntity(blogRequestDTO);
         blog.setUser(user);
 
@@ -133,15 +121,16 @@ public class BlogService implements IBlogService{
         Blog blog = blogRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Blog not found"));
 
-        // Update only provided fields
         if (blogRequestDTO.getTitle() != null && !blogRequestDTO.getTitle().isBlank()) {
             moderationService.checkComment(blogRequestDTO.getTitle());
             blog.setTitle(blogRequestDTO.getTitle());
         }
+
         if (blogRequestDTO.getContent() != null && !blogRequestDTO.getContent().isBlank()) {
             moderationService.checkComment(blogRequestDTO.getContent());
             blog.setContent(blogRequestDTO.getContent());
         }
+
         if (blogRequestDTO.getImage() != null) {
             blog.setImage(blogRequestDTO.getImage());
         }
@@ -150,7 +139,7 @@ public class BlogService implements IBlogService{
         return blogMapper.toDTO(updatedBlog);
     }
 
-    // Delete a blog post by its ID
+    // Delete a blog post by ID
     @Override
     public void deleteBlog(int id, String username) {
         Blog blog = blogRepository.findById(id)
@@ -158,6 +147,7 @@ public class BlogService implements IBlogService{
         blogRepository.delete(blog);
     }
 
+    // Create a new blog post with image (Cloudinary)
     @Override
     public BlogDTO createBlogWithUpload(String title, String content, MultipartFile image, String imageURL, String username) {
         try {
@@ -167,14 +157,10 @@ public class BlogService implements IBlogService{
             } else if (imageURL != null && !imageURL.isBlank()){
                 uploadedImageUrl = imageURL;
             }
-            // Build DTO
             BlogRequestDTO dto = new BlogRequestDTO(title, content, uploadedImageUrl);
 
-            // Call blog method
             return createBlog(dto, username);
-        } catch (RuntimeException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
+        } catch (RuntimeException | IOException e) {
             throw new RuntimeException(e);
         }
     }

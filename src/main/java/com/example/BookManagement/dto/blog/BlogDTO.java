@@ -14,35 +14,21 @@ import java.util.List;
 @Data
 public class BlogDTO {
 
-    // Blog ID
     private Integer id;
-
-    // Title of the Blog
     private String title;
-
-    // Content of the Blog
     private String content;
-
-    // Optional image URL associated with the Blog
     private String image;
-
-    // Username of the user who post the Blog
     private String username;
 
-    // ID of the user who post the Blog
-    private Integer userId;
-
-    // Blog creation timestamp
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
 
-    // Blog last update timestamp
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updatedAt;
 
-    // Total number of likes for this Blog
+    // total number of likes
     private Long likeCount;
 
-    // List of comments associated with this Blog (nested DTOs)
+    // list of comment
     private List<BlogCommentDTO> comments;
 }

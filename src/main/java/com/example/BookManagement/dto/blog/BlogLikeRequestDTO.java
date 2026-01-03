@@ -10,8 +10,6 @@ import lombok.Data;
  */
 @Data
 public class BlogLikeRequestDTO {
-
-    // ID of the blog to be liked
     @NotNull(message = "Blog ID is required")
     private Integer blogId;
 }

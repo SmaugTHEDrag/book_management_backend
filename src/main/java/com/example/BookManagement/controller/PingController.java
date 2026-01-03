@@ -6,18 +6,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/*
- * Simple controller to check if the backend service is running.
- * Provides a "ping" endpoint for health checks or quick testing.
- */
 @RestController
-@RequestMapping("api/")
+@RequestMapping("/api/")
 @Tag(name = "Ping API", description = "API for monitoring backend uptime using UptimeRobot")
 public class PingController {
 
     // Return "OK" if the service is running
-    @Operation(summary = "Ping backend service", description = "Returns 'OK' to indicate the backend is alive. " +
-            "Can be called every 5 minutes to keep Render awake.")
+    @Operation(summary = "Ping backend service")
     @GetMapping("/ping")
     public String ping(){
         return "OK";

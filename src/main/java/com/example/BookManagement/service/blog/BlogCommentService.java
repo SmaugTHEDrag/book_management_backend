@@ -20,10 +20,6 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.List;
 
-/*
- * Service implementation for managing blog comments
- * Handles adding, updating, deleting, and retrieving comments, including nested replies
- */
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -40,7 +36,7 @@ public class BlogCommentService implements IBlogCommentService {
 
     private final IAIModerationService moderationService;
 
-    // Map a BlogComment entity to BlogCommentDTO recursively (includes nested replies)
+    // Convert comment entity to DTO (including replies)
     private BlogCommentDTO mapToCommentDTO(BlogComment blogComment) {
         BlogCommentDTO dto = blogCommentMapper.toDTO(blogComment);
         if (blogComment.getUser() != null) {
@@ -57,7 +53,7 @@ public class BlogCommentService implements IBlogCommentService {
         return dto;
     }
 
-    // Add a comment to a blog post
+    // Add new comment or reply
     @Override
     public BlogCommentDTO addComment(BlogCommentRequestDTO request, String username) {
         Blog blog = blogRepository.findById(request.getBlogId())
@@ -69,7 +65,7 @@ public class BlogCommentService implements IBlogCommentService {
         comment.setBlog(blog);
         comment.setUser(user);
         if (request.getContent() != null && !request.getContent().isBlank()) {
-            moderationService.checkComment(comment.getContent());
+            moderationService.checkComment(request.getContent());
             comment.setContent(request.getContent());
         }
         comment.setImage(request.getImage());
@@ -78,22 +74,21 @@ public class BlogCommentService implements IBlogCommentService {
             BlogComment parent = commentRepository.findById(request.getParentCommentId())
                     .orElseThrow(() -> new RuntimeException("Parent comment not found"));
             comment.setParentComment(parent);
-            // parent.childComment tự động cập nhật khi saved vì cascade
+            // parent.childComment
         }
 
         BlogComment saved = commentRepository.save(comment);
         return mapToCommentDTO(saved);
     }
 
-     // Update an existing comment
-     // Only the comment owner is allowed to update
+    // Update comment content or image
     @Override
     public BlogCommentDTO updateComment(Integer commentId, BlogCommentRequestDTO request, String username) {
         BlogComment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new RuntimeException("Comment not found"));
 
         if (request.getContent() != null && !request.getContent().isBlank()) {
-            moderationService.checkComment(comment.getContent());
+            moderationService.checkComment(request.getContent());
             comment.setContent(request.getContent());
         }
         if (request.getImage() != null) comment.setImage(request.getImage());
@@ -103,7 +98,7 @@ public class BlogCommentService implements IBlogCommentService {
     }
 
 
-    // Delete a comment by its ID
+    // Delete a comment
     @Override
     public void deleteComment(Integer commentId, String username) {
         BlogComment comment = commentRepository.findById(commentId)
@@ -112,14 +107,12 @@ public class BlogCommentService implements IBlogCommentService {
     }
 
 
-     // Get all top-level comments for a specific blog post
-     // Nested replies are included in the response.
+    // Get comments of a blog (only top-level, replies included)
     @Override
     public List<BlogCommentDTO> getCommentsByBlog(Integer blogId) {
         Blog blog = blogRepository.findById(blogId)
                 .orElseThrow(() -> new RuntimeException("Blog not found"));
 
-        // Get top-level comments (parent = null) and map to DTO
         return commentRepository.findAllByBlogAndParentCommentIsNull(blog)
                 .stream()
                 .map(this::mapToCommentDTO)

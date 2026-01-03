@@ -10,10 +10,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/*
- * Entity of comment on blog
- * Supports nested comments (replies) via parent-child relationship
- */
 @Entity
 @Table(name = "blog_comment")
 @Getter
@@ -23,34 +19,38 @@ public class BlogComment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id; // Auto-generated primary key
+    private int id;
 
+    // related blog
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "blog_id", nullable = false)
-    private Blog blog; // The blog that this comment belongs to
+    private Blog blog;
 
+    // comment author
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user; // The user who write this blog
+    private User user;
 
+    // parent comment (for replies)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_comment_id")
-    private BlogComment parentComment; // Parent comment (if owner reply)
+    private BlogComment parentComment;
 
+    // replies of this comment
     @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<BlogComment> childComment; // Replies to this comment
+    private List<BlogComment> childComment;
 
     @Column(name = "content", columnDefinition = "TEXT", nullable = false)
-    private String content; // Comment Content
+    private String content;
 
     @Column(name = "image_url", length = 500)
-    private String image; // URL of image attached to the comment (optional)
+    private String image;
 
     @Column(name = "created_at")
     @CreationTimestamp
-    private LocalDateTime createdAt; // Timestamp for comment creation
+    private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
     @UpdateTimestamp
-    private LocalDateTime updatedAt; // Timestamp for comment last update
+    private LocalDateTime updatedAt;
 }

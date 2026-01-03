@@ -6,18 +6,18 @@ import com.example.BookManagement.dto.review.ReviewRequestDTO;
 import java.util.List;
 
 public interface IReviewService {
-    // User thêm review cho 1 book
+    // Create a review for a book
     ReviewDTO createReview(String username, ReviewRequestDTO request);
 
-    // User sửa review của chính mình
+    // Update user's own review
     ReviewDTO updateReview(Integer id, String username, ReviewRequestDTO request);
 
-    // User xoá review của chính mình
+    // Delete user's own review
     void deleteReview(Integer id, String username);
 
-    // Xem tất cả review của 1 book
+    // Get all reviews of a book
     List<ReviewDTO> getReviewsByBook(Integer bookId);
 
-    // (Optional) Xem review của chính user
+    // Get all reviews written by a user (optional)
     List<ReviewDTO> getReviewsByUser(String username);
 }

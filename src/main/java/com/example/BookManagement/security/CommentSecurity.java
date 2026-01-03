@@ -3,6 +3,7 @@ package com.example.BookManagement.security;
 import com.example.BookManagement.entity.User;
 import com.example.BookManagement.repository.IBlogCommentRepository;
 import com.example.BookManagement.repository.IUserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -14,18 +15,14 @@ import java.util.Optional;
  * @PreAuthorize("@commentSecurity.canDelete(#commentId, authentication.name)")
  */
 @Component("commentSecurity")
+@RequiredArgsConstructor
 public class CommentSecurity {
 
-    @Autowired
-    private IBlogCommentRepository commentRepository;
+    private final IBlogCommentRepository commentRepository;
 
-    @Autowired
-    private IUserRepository userRepository;
+    private final IUserRepository userRepository;
 
-
-    // Check if the user can delete the blog comment
-    // Comment owner -> can delete
-    // Blog owner -> can delete
+    // Comment owner or blog owner can delete the comment
     public boolean canDelete(Integer commentId, String username) {
         if (commentId == null || username == null) return false;
 
@@ -37,7 +34,6 @@ public class CommentSecurity {
                 .orElse(false);
     }
 
-    // Check if the user can edit the comment
     // Only comment owner can edit
     public boolean canEdit(Integer commentId, String username) {
         if (commentId == null || username == null) return false;

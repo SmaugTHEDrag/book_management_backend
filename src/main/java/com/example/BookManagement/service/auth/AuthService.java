@@ -4,6 +4,7 @@ import com.example.BookManagement.dto.user.UserDTO;
 import com.example.BookManagement.entity.Role;
 import com.example.BookManagement.entity.User;
 import com.example.BookManagement.form.RegisterForm;
+import com.example.BookManagement.mapper.AuthMapper;
 import com.example.BookManagement.repository.IUserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -16,10 +17,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-/*
- * Implementation of authentication service
- * Handles user registration and login for Spring Security
- */
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -28,50 +25,40 @@ public class AuthService implements IAuthService, UserDetailsService {
 
     private final IUserRepository userRepository;
 
-    private final ModelMapper modelMapper;
+    private final AuthMapper authMapper;
 
     private final BCryptPasswordEncoder passwordEncoder;
 
-
-    // Registers a new user with validation for duplicate username/email (default role: CUSTOMER)
     @Override
     public UserDTO register(RegisterForm registerForm) {
-        // Check for duplicate username
         if (userRepository.existsByUsername(registerForm.getUsername())) {
-            throw new RuntimeException("Username already exists");
+            throw new IllegalArgumentException("Username already exists");
         }
-        // Check for duplicate email
+
         if (userRepository.existsByEmail(registerForm.getEmail())) {
-            throw new RuntimeException("Email already exists");
+            throw new IllegalArgumentException("Email already exists");
         }
 
-        // Map RegisterForm -> User entity
-        User user = modelMapper.map(registerForm, User.class);
-
-        // Encrypt password before saving
+        User user = authMapper.toUserEntity(registerForm);
         user.setPassword(passwordEncoder.encode(registerForm.getPassword()));
 
-        // Set role (default: CUSTOMER)
-        if (registerForm.getRole() != null && !registerForm.getRole().isEmpty()) {
-            user.setRole(Role.valueOf(registerForm.getRole().toUpperCase()));
-        } else {
-            user.setRole(Role.CUSTOMER);
+        // Default role is CUSTOMER
+        Role role = Role.CUSTOMER;
+        if (registerForm.getRole() != null) {
+            role = Role.valueOf(registerForm.getRole().toUpperCase());
         }
+        user.setRole(role);
 
-        // Save user and return DTO
         User savedUser = userRepository.save(user);
-        return modelMapper.map(savedUser, UserDTO.class);
+        return authMapper.toDTO(savedUser);
     }
 
-    // Loads a user by their username or email for Spring Security authentication.
     @Override
     public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
-        // Find user by email if login contains '@', otherwise by username
         User user = login.contains("@")
                 ? userRepository.findByEmail(login).orElseThrow(() -> new UsernameNotFoundException("Email not found"))
                 : userRepository.findByUsername(login).orElseThrow(() -> new UsernameNotFoundException("Username not found"));
 
-        // Return Spring Security User object
         return new org.springframework.security.core.userdetails.User(
                 user.getUsername(),
                 user.getPassword(),

@@ -20,22 +20,16 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.HashMap;
 import java.util.Map;
 
-/*
- * REST Controller responsible for user registration.
- * Accepts user registration requests, validates input,
- * and registers a new user in the system.
- */
 @RestController
 @RequestMapping("api")
-@Tag(name = "Auth API", description = "API for user authentication and registration")
+@Tag(name = "Auth API", description = "API for user sign up")
 @RequiredArgsConstructor
 public class RegisterController {
 
-    private final IAuthService userService; // Service layer to handle user registration logic
+    private final IAuthService userService;
 
-    // Registers a new user
-    @Operation(summary = "Register a new user", description = "Registers a new user with username, email, password, " +
-            "and other details.")
+    // registers a new user
+    @Operation(summary = "Register a new user")
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterForm registerForm, BindingResult bindingResult) {
         // Check for validation errors

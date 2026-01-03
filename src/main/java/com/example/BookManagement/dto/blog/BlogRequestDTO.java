@@ -15,14 +15,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class BlogRequestDTO {
 
-    // Title of the blog
     @NotBlank(message = "Title cannot be blank")
     private String title;
-
-    // Content of the blog
     @NotBlank(message = "Content cannot be blank")
     private String content;
-
-    // Optional image URL associated with the blog
     private String image;
 }

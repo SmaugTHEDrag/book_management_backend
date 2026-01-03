@@ -37,9 +37,9 @@ public class Review {
 
     @Column(name = "created_at", updatable = false)
     @CreationTimestamp
-    private LocalDateTime createdAt; // Timestamp of book creation
+    private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
     @UpdateTimestamp
-    private LocalDateTime updatedAt; // Timestamp of book last update
+    private LocalDateTime updatedAt;
 }

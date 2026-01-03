@@ -8,17 +8,14 @@ import org.springframework.data.jpa.domain.Specification;
 import java.util.ArrayList;
 import java.util.List;
 
-/*
- * Builds dynamic filtering conditions for Book queries.
- */
 public class BookSpecification {
 
-    // Create a dynamic WHERE clause based on filters from BookFilterForm.
+    // Build dynamic query based on filter conditions
     public static Specification<Book> buildWhere(BookFilterForm form) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            // Common search: match title OR author
+            // Global search: match title OR author
             if(form.getSearch() != null && !form.getSearch().isEmpty()){
                 String value = "%" + form.getSearch().toLowerCase() + "%";
 
@@ -27,25 +24,24 @@ public class BookSpecification {
                 Predicate authorPredicate = criteriaBuilder.like(
                         criteriaBuilder.lower(root.get("author")), value);
 
-                // Add condition: title OR author
                 predicates.add(criteriaBuilder.or(titlePredicate, authorPredicate));
             }
-            // If no common search, check title and author separately
+            // Search title and author separately
             else {
-                // Search by title
+                // Filter by title
                 if(form.getTitleSearch() != null && !form.getTitleSearch().isEmpty()){
                     String value = "%" + form.getTitleSearch().toLowerCase() + "%";
                     predicates.add(criteriaBuilder.like(
                             criteriaBuilder.lower(root.get("title")), value));
                 }
-                // Search by author
+                // Filter by author
                 if(form.getAuthorSearch() != null && !form.getAuthorSearch().isEmpty()){
                     String value = "%" + form.getAuthorSearch().toLowerCase() + "%";
                     predicates.add(criteriaBuilder.like(
                             criteriaBuilder.lower(root.get("author")), value));
                 }
             }
-            // Search by category
+            // Filter by category
             if(form.getCategorySearch() != null && !form.getCategorySearch().isEmpty()){
                 String value = "%" + form.getCategorySearch().toLowerCase() + "%";
                 predicates.add(criteriaBuilder.like(root.get("category"), value));

@@ -10,10 +10,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/*
- * Entity of book
- * Book can be favorite by many user
- */
 @Entity
 @Table(name = "books")
 @Getter
@@ -23,37 +19,39 @@ public class Book {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id; // Auto-generated primary key
+    private Integer id;
 
     @Column(name = "bookTitle", nullable=false)
-    private String title; // Book Title
+    private String title;
 
     @Column(name = "authorName",length = 100, nullable=false)
-    private String author; // Book Author
+    private String author;
 
     @Column(name = "imageURL")
-    private String image; // URL of the Book Cover Image
+    private String image;
 
     @Column(nullable=false)
-    private String category; // Book Category (ex: Fiction, Romance, etc)
+    private String category;
 
     @Column(name = "bookDescription", columnDefinition = "TEXT")
-    private String description; // Book Description
+    private String description;
 
     @Column(name = "bookPDFURL")
-    private String pdf; // URL to PDF file of the book
+    private String pdf;
 
     @Column(name = "created_at")
     @CreationTimestamp
-    private LocalDateTime createdAt; // Timestamp of book creation
+    private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
     @UpdateTimestamp
-    private LocalDateTime updatedAt; // Timestamp of book last update
-
-    // ---- RELATIONSHIP ----
+    private LocalDateTime updatedAt;
 
     // One book can be favorite by many user;
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Favorite> favorite;
+
+    // One book can have many reviews;
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Review> reviews;
 }

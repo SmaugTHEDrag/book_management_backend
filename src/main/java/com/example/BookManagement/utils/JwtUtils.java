@@ -13,14 +13,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/*
- * Utility class for generating, validating, and reading JWT tokens.
- */
+// JWT utility for creating and validating tokens
 public class JwtUtils {
-    // Token expiration time: 30 days (in milliseconds)
+
+    // Token expires in 30 days
     private static final long EXPIRE_TIME = 30 * 24 * 60 * 60 * 1000L;
 
-    // Secret key for signing the JWT (must be at least 64 characters for HS512)
+    // Secret key for signing the JWT (HS512)
     private static final String SECRET = "ThisIsASecretKeyForJwtThatIsAtLeastSixtyFourCharactersLong123456!";
     private static final SecretKey SECRET_KEY = Keys.hmacShaKeyFor(SECRET.getBytes());
 
@@ -35,10 +34,10 @@ public class JwtUtils {
 
         // Build the JWT
         return Jwts.builder()
-                .setSubject(user.getUsername())  // Store username as the subject
-                .claim("roles", roles)  // Add roles to the JWT payload
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRE_TIME))  // Set expiration time
-                .signWith(SECRET_KEY, SignatureAlgorithm.HS512) // Sign with HS512 algorithm
+                .setSubject(user.getUsername())  // username
+                .claim("roles", roles)  // role
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRE_TIME))  // expiration time
+                .signWith(SECRET_KEY, SignatureAlgorithm.HS512) // Sign with HS512
                 .compact();
     }
 
@@ -46,12 +45,12 @@ public class JwtUtils {
     public static boolean validateJwt(String jwt) {
         try {
             Jwts.parserBuilder()
-                    .setSigningKey(SECRET_KEY)  // Set the signing key for validation
+                    .setSigningKey(SECRET_KEY)
                     .build()
-                    .parseClaimsJws(jwt);      // Parse and validate
+                    .parseClaimsJws(jwt);
             return true;
         } catch (Exception exception) {
-            exception.printStackTrace(); // Log the error
+            exception.printStackTrace();
         }
         return false;
     }
@@ -59,10 +58,10 @@ public class JwtUtils {
     // Extract username from JWT token.
     public static String getUsername(String jwt) {
         Claims claims = Jwts.parserBuilder()
-                .setSigningKey(SECRET_KEY)  // Set the signing key
+                .setSigningKey(SECRET_KEY)
                 .build()
-                .parseClaimsJws(jwt)   // Parse token
-                .getBody();  // Get payload
-        return claims.getSubject();   // Extract username
+                .parseClaimsJws(jwt)
+                .getBody();
+        return claims.getSubject();
     }
 }

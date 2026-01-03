@@ -6,33 +6,27 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-/*
- * Data Transfer Object (DTO) for paginated response of UserDTO
- * Used to return a page of users along with pagination metadata
- */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserPageResponse {
 
-    // List of users in the current page
+    // users in current page
     private List<UserDTO> content;
 
-    // Current page number(0-based depending on implementation
+    // current page index (0-based)
     private int currentPage;
 
-    // Total number of users in the database
+    // total number of users
     private long totalItems;
 
-    // Total number of pages available
+    // total number of pages
     private int totalPages;
 
-    // Number of items per page
+    // page size
     private int pageSize;
 
-    // Flag indicating if this is the last page
+    // first / last page flags
     private boolean isLast;
-
-    // Flag indicating if this is the first page
     private boolean isFirst;
 }

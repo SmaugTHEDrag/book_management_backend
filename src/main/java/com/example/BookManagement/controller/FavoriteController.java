@@ -14,36 +14,30 @@ import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 import java.util.List;
 
-/*
- * REST Controller for managing user's favorite books.
- * Handles adding, removing, and retrieving favorite books for the logged-in user.
- */
 @RestController
-@RequestMapping("api/favorites")
+@RequestMapping("/api/favorites")
 @Tag(name = "Favorite API", description = "APIs for managing user's favorite books")
 @RequiredArgsConstructor
 public class FavoriteController {
 
-    private final IFavoriteService favoriteService; // Service layer for favorite operations
+    private final IFavoriteService favoriteService;
 
-    //Get all favorite books for the current logged-in user
-    @Operation(summary = "Get all favorites", description = "Retrieve all favorite books for the logged-in user")
+    // get all favorites for the current user
+    @Operation(summary = "Get all favorites")
     @GetMapping
     public ResponseEntity<List<FavoriteDTO>> getFavorites(Principal principal) {
-        String username = principal.getName();
-        System.out.println("Logged in username: " + username); // Optional: logging for debug
         return ResponseEntity.ok(favoriteService.getAllFavorites(principal.getName()));
     }
 
-    // Add a book to the current user's favorites
-    @Operation(summary = "Add favorite", description = "Add a book to the current user's favorites")
+    // add a book to favorite
+    @Operation(summary = "Add favorite")
     @PostMapping
     public ResponseEntity<FavoriteDTO> addFavorite(@RequestBody @Valid FavoriteRequestDTO request, Principal principal) {
         return ResponseEntity.ok(favoriteService.addFavorite(request, principal.getName()));
     }
 
-    // Remove a book from the current user's favorites
-    @Operation(summary = "Remove favorite", description = "Remove a book from the current user's favorites")
+    // remove a book from favorite
+    @Operation(summary = "Remove favorite")
     @DeleteMapping("/{bookId}")
     public ResponseEntity<?> removeFavorite(@PathVariable Integer bookId, Principal principal) {
         favoriteService.removeFavorite(bookId, principal.getName());

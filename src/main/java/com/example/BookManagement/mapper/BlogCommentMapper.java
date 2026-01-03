@@ -8,7 +8,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface BlogCommentMapper {
 
-    @Mapping(target = "username", source = "user.username")  // comment.getUser().getUsername()
-    @Mapping(target = "blogId", source = "blog.id")          // comment.getBlog().getId()
+    @Mapping(target = "username", source = "user.username")
+    @Mapping(target = "blogId", source = "blog.id")
     BlogCommentDTO toDTO(BlogComment blogComment);
 }

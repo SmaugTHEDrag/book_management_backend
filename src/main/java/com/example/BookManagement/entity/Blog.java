@@ -10,10 +10,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/*
-* Entity of blog
-* Blog can have lots of likes, comments;
-*/
 @Entity
 @Table (name = "blogs")
 @Getter
@@ -23,30 +19,28 @@ public class Blog {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id; // Auto-generated primary key
+    private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user; // The user that post the blog
+    private User user;
 
     @Column(name = "title", nullable = false)
-    private String title; // Blog Title
+    private String title;
 
     @Column(name = "content", columnDefinition = "TEXT", nullable = false)
-    private String content; // Blog content
+    private String content;
 
     @Column(name = "image_url", length = 500)
-    private String image; // image URL on the blog (optional)
+    private String image;
 
     @Column(name = "created_at")
     @CreationTimestamp
-    private LocalDateTime createdAt; // Timestamp for blog creation
+    private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
     @UpdateTimestamp
-    private LocalDateTime updatedAt; // Timestamp for blog last update
-
-    // ---- RELATIONSHIP ----
+    private LocalDateTime updatedAt;
 
     // One blog can have many likes
     @OneToMany(mappedBy = "blog", cascade = CascadeType.ALL, orphanRemoval = true)

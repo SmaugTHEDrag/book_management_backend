@@ -14,8 +14,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleToxicContent(ToxicContentException ex) {
         return ResponseEntity
                 .status(ex.getStatus())
-                .body(Map.of(
-                        "message", ex.getMessage()
-                ));
+                .body(Map.of("message", ex.getMessage()));
     }
 }

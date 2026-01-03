@@ -8,14 +8,9 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 
-/*
-* Favorite book entity marked by user
-* Each user can favorite a book only once (enforced by unique constraint)
-*/
 @Entity
 @Table(name = "favorites", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"user_id", "book_id"})
-})
+        @UniqueConstraint(columnNames = {"user_id", "book_id"})})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -23,17 +18,19 @@ public class Favorite {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id; // Auto-generated primary key
+    private Integer id;
 
+    // user's favorite
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user; // The user that favorite the book
+    private User user;
 
+    // favorite book
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id", nullable = false)
-    private Book book; // The book that is favorite
+    private Book book;
 
     @Column(name = "added_at")
     @CreationTimestamp
-    private LocalDateTime addedAt; // Timestamp when user add book to favorite
+    private LocalDateTime addedAt;
 }

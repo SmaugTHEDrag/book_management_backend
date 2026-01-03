@@ -5,11 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-/*
- * Service that provides system prompts for the Book Assistant chatbot.
- * This service centralizes the system prompt text used for AI chat responses,
- * and can generate contextual prompts by including user messages
- */
 @Service
 @Transactional
 @RequiredArgsConstructor

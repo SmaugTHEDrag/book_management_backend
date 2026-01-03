@@ -17,61 +17,53 @@ import org.springframework.web.multipart.MultipartFile;
 import java.security.Principal;
 import java.util.List;
 
-/*
- * REST Controller for managing Blog resources.
- * Provides endpoints to create, read, update, and delete blogs.
- * Requires authentication for creating, updating, and deleting blogs.
- */
 @RestController
 @RequestMapping("/api/blogs")
-@Tag(name = "Blog API", description = "APIs for managing blogs")
+@Tag(name = "Blog API", description = "APIs for blogs")
 @RequiredArgsConstructor
 public class BlogController {
 
-    private final IBlogService blogService;  // Service layer handling blog business logic
+    private final IBlogService blogService;
 
-    private final ModelMapper modelMapper;  // Used to map entities to DTOs
-
-    // Get all blogs
-    @Operation(summary = "Get all blogs", description = "Retrieve a list of all blogs")
+    // get all blogs
+    @Operation(summary = "Get all blogs")
     @GetMapping
     public ResponseEntity<List<BlogDTO>> getAllBlogs() {
         return ResponseEntity.ok(blogService.getAllBlogs());
     }
 
-    // Get blog by ID
-    @Operation(summary = "Get blog by ID", description = "Retrieve details of a single blog by its ID")
+    // get one blog by ID
+    @Operation(summary = "Get blog by ID")
     @GetMapping("/{id}")
     public ResponseEntity<BlogDTO> getBlogById(@PathVariable int id) {
         return ResponseEntity.ok(blogService.getBlogById(id));
     }
 
-    @Operation(summary = "Create a blog", description = "Authenticated user can create a new blog without image")
-    // Create blog (authenticated user)
+    // create new blog (no image)
+    @Operation(summary = "Create a blog")
     @PostMapping
     public ResponseEntity<BlogDTO> createBlog(@Valid @RequestBody BlogRequestDTO blogRequestDTO, Principal principal) {
         BlogDTO blogDTO = blogService.createBlog(blogRequestDTO, principal.getName());
         return ResponseEntity.ok(blogDTO);
     }
 
-    // Upload a blog image integrate to Cloudinary
-    @Operation(summary = "Create blog with image", description = "Upload a blog image to Cloudinary or provide image URL")
+    // create blog with image/file (Cloudinary)
+    @Operation(summary = "Create blog with image")
     @PostMapping(value = "/upload", consumes = {"multipart/form-data"})
     public ResponseEntity<BlogDTO> createBlogWithUpload(
-            // Text fields sent via multipart/form-data
             @RequestPart("title") String title,
             @RequestPart("content") String content,
-            // File uploads
             @RequestPart(value = "image", required = false) MultipartFile image,
             @RequestPart(value = "imageURL", required = false) String imageURL,
             Principal principal
     ) {
+        // file > imageURL if both provided
         BlogDTO created = blogService.createBlogWithUpload(title, content, image, imageURL, principal.getName());
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-    // Update blog (BLog owner only)
-    @Operation(summary = "Update a blog", description = "Update blog details (only owner can update)")
+    // update blog (Blog owner only)
+    @Operation(summary = "Update a blog")
     @PreAuthorize("@blogSecurity.isOwner(#id, authentication.name)")
     @PutMapping("/{id}")
     public ResponseEntity<BlogDTO> updateBlog(@PathVariable int id, @RequestBody @Valid BlogRequestDTO blogRequestDTO, Principal principal) {
@@ -79,8 +71,8 @@ public class BlogController {
         return ResponseEntity.ok(blogDTO);
     }
 
-    // Delete blog (Blog owner or admin only)
-    @Operation(summary = "Delete a blog", description = "Delete a blog (admin or owner)")
+    // delete blog (Blog owner or admin only)
+    @Operation(summary = "Delete a blog")
     @PreAuthorize("hasAuthority('ADMIN') or @blogSecurity.isOwner(#id, authentication.name)")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBlog(@PathVariable int id, Principal principal) {

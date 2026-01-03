@@ -6,61 +6,27 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
-/*
- * Form object for handling user registration request
- * Contains basic validation rules for username, email, and password
- */
 @Data
 public class RegisterForm {
 
-    // ---- USERNAME -----
-
-    /*
-     * User must:
-     * - not be blank
-     * - contain 6 to 20 characters
-     * - Only contain letters, numbers, underscores
-     */
-    @NotBlank(message = "Username does not blank")
-    @Size(min = 6, max = 20, message = "Username from 6 to 20 letters")
-    @Pattern(regexp = "^[a-zA-Z0-9_]+$", message = "Username can only contain letters, numbers or underscore ('_') ")
+    @NotBlank(message = "Username must not be blank")
+    @Size(min = 6, max = 20, message = "Username must be between 6 and 20 characters")
+    @Pattern(regexp = "^[a-zA-Z0-9_]+$", message = "Username can only contain letters, numbers, and underscores ")
     private String username;
 
-
-    // ---- EMAIL -----
-
-    /*
-     * Email must:
-     * - Not be blank
-     * - Follow a valid email format
-     */
-    @NotBlank(message = "Email does not blank")
-    @Email(message = "Email is valid")
+    @NotBlank(message = "Email must not be blank")
+    @Email(message = "Invalid email format")
     private String email;
 
-    // ---- PASSWORD -----
-
-    /*
-     * Password must:
-     * - Not be blank
-     * - Contain at least 8 characters
-     * - Contain at least 1 uppercase letter
-     * - Contain at least 1 number
-     * - Contain at least 1 special character (!@#$%^&*()_+-=)
-     */
-    @NotBlank(message = "Password does not blank")
-    @Size(min = 8, message = "Password must have at least 8 letters")
+    @NotBlank(message = "Password must not be blank")
+    @Size(min = 8, message = "Password must be at least 8 characters long")
     @Pattern.List({
-            @Pattern(regexp = ".*[A-Z].*", message = "Password must have at least 1 upper letter"),
-            @Pattern(regexp = ".*\\d.*", message = "Password must have at least 1 number"),
-            @Pattern(regexp = ".*[!@#$%^&*()_+\\-=].*", message = "Password must have at least 1 special symbol")
+            @Pattern(regexp = ".*[A-Z].*", message = "Password must contain at least 1 upper letter"),
+            @Pattern(regexp = ".*\\d.*", message = "Password must contain at least 1 number"),
+            @Pattern(regexp = ".*[!@#$%^&*()_+\\-=].*", message = "Password must contain at least 1 special symbol")
     })
     private String password;
 
-    // ---- ROLE -----
-
-    /*
-     * User role (OPTIONAL) ADMIN OR CUSTOMER
-     */
+    @Pattern(regexp = "CUSTOMER", message = "Only CUSTOMER role is allowed")
     private String role;
 }

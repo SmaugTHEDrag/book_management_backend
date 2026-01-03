@@ -5,38 +5,30 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
-/*
- * Data Transfer Object (DTO) for representing the response from the chatbot or chat system
- * Contains the message content, timestamp, and error details
- */
 @Data
 public class ChatResponse {
 
-    // The actual message return from the chatbot or system
+    // response message from the chatbot
     private String content;
 
-    // The time when this response is created
+    // response creation time
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime timestamp;
 
-    // Indicates whether this response contains error
+    // true if this response represents an error
     private boolean isError;
 
-    // Error details if error occur
+    // error message (only set when error = true)
     private String errorMessage;
 
-    /*
-     * Constructor for a successful response
-     */
+    // success response
     public ChatResponse(String content) {
         this.content = content;
         this.timestamp = LocalDateTime.now();
         this.isError = false;
     }
 
-    /*
-     * Constructor for error or special response
-     */
+    // error response
     public ChatResponse(String content, boolean isError, String errorMessage) {
         this.content = content;
         this.timestamp = LocalDateTime.now();

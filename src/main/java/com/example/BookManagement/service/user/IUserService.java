@@ -8,22 +8,18 @@ import com.example.BookManagement.entity.User;
 import com.example.BookManagement.form.UserFilterForm;
 import org.springframework.data.domain.Pageable;
 
-/*
- * Service interface for managing user-related operations
- * Defines methods for CRUD operations and role updates
- */
 public interface IUserService  {
 
-    // Retrieve all users with filtering and pagination
+    // Get paginated user with filters
     UserPageResponse getAllUsers(UserFilterForm form, Pageable pageable);
 
-    // Get user details by ID
+    // Get a user by ID
     UserDTO getUserById(int id);
 
     // Create a new user
     UserDTO createUser(UserRequestDTO userRequestDTO);
 
-    // Update existing user information
+    // Update an existing user
     UserDTO updateUser(int id, UserRequestDTO userRequestDTO);
 
     // Delete a user by ID

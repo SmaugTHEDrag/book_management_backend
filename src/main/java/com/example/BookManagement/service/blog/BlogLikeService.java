@@ -4,6 +4,7 @@ import com.example.BookManagement.dto.blog.BlogLikeDTO;
 import com.example.BookManagement.entity.Blog;
 import com.example.BookManagement.entity.BlogLike;
 import com.example.BookManagement.entity.User;
+import com.example.BookManagement.mapper.BlogLikeMapper;
 import com.example.BookManagement.repository.IBlogLikeRepository;
 import com.example.BookManagement.repository.IBlogRepository;
 import com.example.BookManagement.repository.IUserRepository;
@@ -16,10 +17,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-/*
- * Service implementation for managing blog likes.
- * Handles logic for liking, unliking, and retrieving like information for blogs.
- */
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -32,9 +29,9 @@ public class BlogLikeService implements IBlogLikeService{
 
     private final IUserRepository userRepository;
 
-    private final ModelMapper modelMapper;
+    private final BlogLikeMapper blogLikeMapper;
 
-    // Like a blog for the given user (idempotent: if the user already liked the blog, returns existing like)
+    // Like blog (return existing like if already liked)
     @Override
     public BlogLikeDTO likeBlog(Integer blogId, String username) {
         Blog blog = blogRepository.findById(blogId)
@@ -43,10 +40,9 @@ public class BlogLikeService implements IBlogLikeService{
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // If already liked → return existing
         Optional<BlogLike> existing = likeRepository.findByBlogAndUser(blog, user);
         if (existing.isPresent()) {
-            return modelMapper.map(existing.get(), BlogLikeDTO.class);
+            return blogLikeMapper.toDTO(existing.get());
         }
 
         BlogLike like = new BlogLike();
@@ -54,11 +50,11 @@ public class BlogLikeService implements IBlogLikeService{
         like.setUser(user);
 
         BlogLike saved = likeRepository.save(like);
-        return modelMapper.map(saved, BlogLikeDTO.class);
+        return blogLikeMapper.toDTO(saved);
     }
 
 
-    // Remove a user's like from a blog
+    // Unlike blog
     @Override
     public void unlikeBlog(Integer blogId, String username) {
         Blog blog = blogRepository.findById(blogId)
@@ -73,7 +69,7 @@ public class BlogLikeService implements IBlogLikeService{
         likeRepository.delete(like);
     }
 
-    // Get the total number of likes for a specific blog
+    // Count likes of a blog
     @Override
     public long getLikeCount(Integer blogId) {
         Blog blog = blogRepository.findById(blogId)
@@ -81,7 +77,7 @@ public class BlogLikeService implements IBlogLikeService{
         return likeRepository.countByBlog(blog);
     }
 
-    // Check if a specific user has liked a specific blog
+    // Check if user liked blog
     @Override
     public boolean hasUserLiked(Integer blogId, String username) {
         Blog blog = blogRepository.findById(blogId)
@@ -91,13 +87,4 @@ public class BlogLikeService implements IBlogLikeService{
         return likeRepository.existsByBlogAndUser(blog, user);
     }
 
-    // Map a BlogLike entity to BlogLikeDTO
-    private BlogLikeDTO mapToDTO(BlogLike like) {
-        BlogLikeDTO dto = new BlogLikeDTO();
-        dto.setId(like.getId());
-        dto.setBlogId(like.getBlog() != null ? like.getBlog().getId() : null);
-        dto.setUsername(like.getUser() != null ? like.getUser().getUsername() : null);
-        dto.setLikedAt(like.getLikedAt());
-        return dto;
-    }
 }

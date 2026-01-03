@@ -2,6 +2,7 @@ package com.example.BookManagement.service.aimoderation;
 
 import com.example.BookManagement.exception.ToxicContentException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -13,8 +14,11 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AIModerationService implements IAIModerationService{
     private final RestTemplate restTemplate;
-    private static final String AI_MODERATION_URL = "http://localhost:8000/moderate";
 
+    @Value("${ai.moderation.url}")
+    private String AI_MODERATION_URL;
+
+    // check toxic content
     @Override
     public void checkComment(String comment){
         try {

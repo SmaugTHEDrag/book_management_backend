@@ -5,6 +5,8 @@ import com.example.BookManagement.dto.favorite.FavoriteRequestDTO;
 import com.example.BookManagement.entity.Book;
 import com.example.BookManagement.entity.Favorite;
 import com.example.BookManagement.entity.User;
+import com.example.BookManagement.exception.ResourceNotFoundException;
+import com.example.BookManagement.mapper.FavoriteMapper;
 import com.example.BookManagement.repository.IBookRepository;
 import com.example.BookManagement.repository.IFavoriteRepository;
 import com.example.BookManagement.repository.IUserRepository;
@@ -13,14 +15,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-/*
- * Service implementation for managing user's favorite books
- */
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -33,18 +33,14 @@ public class FavoriteService implements IFavoriteService{
 
     private final IBookRepository bookRepository;
 
-    private final ModelMapper modelMapper;
+    private final FavoriteMapper favoriteMapper;
 
-    // Retrieves all favorite books of a user.
+    // Get all favorite books of current user
     @Override
     public List<FavoriteDTO> getAllFavorites(String username) {
-        // Find the user by username
         User user = userRepository.findByUsername(username)
-                .stream()
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        // Get all favorites for this user
         List<Favorite> favorites = favoriteRepository.findByUserId(user.getId());
 
         // Convert favorites to DTOs
@@ -66,19 +62,16 @@ public class FavoriteService implements IFavoriteService{
     // Adds a book to the user's favorites.
     @Override
     public FavoriteDTO addFavorite(FavoriteRequestDTO request, String username) {
-        // Find the user by username
+
         User user = userRepository.findByUsername(username)
-                .stream()
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        // Find the book by ID
         Book book = bookRepository.findById(request.getBookId())
-                .orElseThrow(() -> new RuntimeException("Book not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Book not found"));
 
-        // Check if the book is already in the user's favorites
+        // Prevent duplicate favorite
         if (favoriteRepository.existsByUserIdAndBookId(user.getId(), book.getId())) {
-            throw new RuntimeException("Book already in favorites");
+            throw new IllegalArgumentException("Book already in favorites");
         }
 
         // Create and save the favorite record
@@ -87,23 +80,21 @@ public class FavoriteService implements IFavoriteService{
         favorite.setBook(book);
 
         // Return the saved favorite as DTO
-        return modelMapper.map(favoriteRepository.save(favorite), FavoriteDTO.class);
+        return favoriteMapper.toDTO(favoriteRepository.save(favorite));
     }
 
     // Removes a book from the user's favorites.
     @Override
     public void removeFavorite(Integer bookId, String username) {
-        // Find the user by username
+
         User user = userRepository.findByUsername(username)
                 .stream()
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        // Find the favorite by user and book ID
         Favorite favorite = favoriteRepository.findByUserIdAndBookId(user.getId(), bookId)
-                .orElseThrow(() -> new RuntimeException("Favorite not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Favorite not found"));
 
-        // Delete the favorite record
         favoriteRepository.delete(favorite);
     }
 }

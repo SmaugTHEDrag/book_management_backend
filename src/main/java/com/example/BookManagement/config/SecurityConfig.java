@@ -22,10 +22,6 @@ import org.springframework.web.cors.CorsConfiguration;
 
 import java.util.List;
 
-/*
- * Spring Security configuration class.
- * Configures JWT authentication, CORS, session management, and endpoint authorization.
- */
 @Configuration
 @EnableMethodSecurity
 @RequiredArgsConstructor
@@ -34,20 +30,13 @@ public class SecurityConfig {
     private final UserDetailsService userDetailsService;
     private final BCryptPasswordEncoder passwordEncoder;
 
-    /*
-     * Configure the SecurityFilterChain.
-     * - Disable CSRF since we use JWT (stateless)
-     * - Configure CORS
-     * - Define which endpoints are public vs. authenticated
-     * - Stateless session (JWT)
-     * - Add JWT filter before UsernamePasswordAuthenticationFilter
-     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         return http
-                // Disable CSRF protection since JWT is used
+                // Disable CSRF because we are using JWT (stateless)
                 .csrf(AbstractHttpConfigurer::disable)
-                // CORS configuration
+
+                // CORS configuration so frontend can call our API from any origin
                 .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration config = new CorsConfiguration();
                     config.setAllowedOriginPatterns(List.of("*")); // allow all origins
@@ -56,9 +45,10 @@ public class SecurityConfig {
                     config.setAllowCredentials(true); // needed for JWT or cookie-based authentication
                     return config;
                 }))
-                // Define endpoint authorization rules
+
+                // Endpoint authorization rules
                 .authorizeHttpRequests(auth -> auth
-                        // Public endpoints: login, register, fetching blogs/books, chat, Swagger docs
+                        // Public endpoints (no auth required)
                         .requestMatchers("/api/login").permitAll()
                         .requestMatchers("/api/register").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/blogs/**").permitAll()
@@ -74,15 +64,18 @@ public class SecurityConfig {
                         // Any other request requires authentication
                         .anyRequest().authenticated()
                 )
-                // Stateless session management (JWT tokens, no server-side session)
+                // JWT-based auth, no server session
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                // Set authentication provider (user details + password encoder)
+
+                // Set the authentication provider (userDetails + password encoder)
                 .authenticationProvider(authenticationProvider())
-                // Add custom JWT filter before the default username/password authentication filter
+
+                // Add JWT filter before default username/password filter
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
+    // Define how Spring should load users and check passwords
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
@@ -91,11 +84,13 @@ public class SecurityConfig {
         return provider;
     }
 
+    // Expose AuthenticationManager for login authentication
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
+    // JWT filter bean (to check token on every request)
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter(UserDetailsService userDetailsService) {
         return new JwtAuthenticationFilter(userDetailsService);

@@ -5,10 +5,6 @@ import com.example.BookManagement.dto.blog.BlogCommentRequestDTO;
 
 import java.util.List;
 
-/*
- * Service interface for managing blog comments
- * Defines methods for adding, updating, deleting, and retrieving comments
- */
 public interface IBlogCommentService {
 
 

@@ -14,36 +14,31 @@ import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 import java.util.List;
 
-/*
- * REST Controller for managing comments on blogs.
- * Supports creating, updating, deleting, and retrieving comments.
- * Replies (nested comments) are supported through parentCommentId in the request DTO.
- */
 @RestController
 @RequestMapping("/api/blogs")
-@Tag(name = "Blog Comment API", description = "APIs for managing comments and replies on blogs")
+@Tag(name = "Blog Comment API", description = "APIs for blog comments")
 @RequiredArgsConstructor
 public class BlogCommentController {
 
-    private final IBlogCommentService commentService;  // Service layer handling comment logic
+    private final IBlogCommentService commentService;
 
-    // Get all comments (top-level + replies) for a blog
-    @Operation(summary = "Get comments for a blog", description = "Returns all top-level and nested comments for a specific blog")
+    // get all comments for a blog (top-level + replies)
+    @Operation(summary = "Get comments for a blog")
     @GetMapping("/{blogId}/comments")
     public ResponseEntity<List<BlogCommentDTO>> getComments(@PathVariable Integer blogId) {
         return ResponseEntity.ok(commentService.getCommentsByBlog(blogId));
     }
 
-    // Add a new comment or reply to a blog
-    @Operation(summary = "Add a comment", description = "Adds a new comment or reply to a blog. If parentCommentId is provided in the request DTO, it creates a reply.")
+    // add a new comment or reply to a blog
+    @Operation(summary = "Add a comment")
     @PostMapping("/{blogId}/comments")
     public ResponseEntity<BlogCommentDTO> addComment(@RequestBody @Valid BlogCommentRequestDTO request, Principal principal) {
         String username = principal.getName();
         return ResponseEntity.ok(commentService.addComment(request, username));
     }
 
-    // Update an existing comment (Comment owner only)
-    @Operation(summary = "Update comment", description = "Updates an existing comment. Only the comment owner can perform this action.")
+    // update a comment (Comment owner only)
+    @Operation(summary = "Update comment")
     @PreAuthorize("@commentSecurity.canEdit(#commentId, authentication.name)")
     @PutMapping("/comments/{commentId}")
     public ResponseEntity<BlogCommentDTO> updateComment(@PathVariable Integer commentId, @RequestBody @Valid BlogCommentRequestDTO request, Principal principal) {
@@ -51,8 +46,8 @@ public class BlogCommentController {
         return ResponseEntity.ok(commentService.updateComment(commentId, request, username));
     }
 
-    // Delete a comment (Blog owner, admin and Comment owner)
-    @Operation(summary = "Delete comment", description = "Deletes a comment. Only the blog owner, admin, or comment owner can perform this action.")
+    // delete a comment (Blog owner, admin and Comment owner)
+    @Operation(summary = "Delete comment")
     @PreAuthorize("hasAuthority('ADMIN') or @commentSecurity.canDelete(#commentId, authentication.name)")
     @DeleteMapping("/comments/{commentId}")
     public ResponseEntity<Void> deleteComment(@PathVariable Integer commentId, Principal principal) {

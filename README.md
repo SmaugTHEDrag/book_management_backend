@@ -189,8 +189,8 @@ npm run dev
 
 ### 🌐 **Live Application**
 [![Frontend](https://img.shields.io/badge/Frontend-Netlify-00C7B7?style=for-the-badge&logo=netlify)](https://ptn-book-storage.netlify.app/)
-[![Backend](https://img.shields.io/badge/Backend-Render-46E3B7?style=for-the-badge&logo=render)](https://book-management-backend-d481.onrender.com)
-[![FastAPI](https://img.shields.io/badge/ML%20Service-Railway-0B0D0E?style=for-the-badge&logo=railway)](https://your-fastapi-service.railway.app)
+[![Backend](https://img.shields.io/badge/Backend-Render-46E3B7?style=for-the-badge&logo=render)](https://book-management-backend-d481.onrender.com/swagger-ui/index.html)
+[![FastAPI](https://img.shields.io/badge/ML%20Service-Render-96EA2D?style=for-the-badge&logo=render)](https://simple-ai-moderation.onrender.com/docs)
 [![API Docs](https://img.shields.io/badge/API%20Docs-Swagger-85EA2D?style=for-the-badge&logo=swagger)](https://book-management-backend-d481.onrender.com/swagger-ui/index.html)
 
 ### 🎬 **Project Walkthrough**

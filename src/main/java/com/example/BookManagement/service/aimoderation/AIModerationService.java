@@ -20,11 +20,11 @@ public class AIModerationService implements IAIModerationService{
 
     // check toxic content
     @Override
-    public void checkComment(String comment){
+    public void checkComment(String comment, String errorMessage){
         try {
             restTemplate.postForEntity(AI_MODERATION_URL, Map.of("text", comment), Void.class);
         } catch(HttpClientErrorException.BadRequest e){
-            throw new ToxicContentException(HttpStatus.BAD_REQUEST,"Review contains inappropriate content");
+            throw new ToxicContentException(HttpStatus.BAD_REQUEST,errorMessage);
         }
     }
 }

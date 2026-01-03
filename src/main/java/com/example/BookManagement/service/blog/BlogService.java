@@ -106,8 +106,8 @@ public class BlogService implements IBlogService{
             throw new IllegalArgumentException("Content is required");
         }
 
-        moderationService.checkComment(blogRequestDTO.getTitle());
-        moderationService.checkComment(blogRequestDTO.getContent());
+        moderationService.checkComment(blogRequestDTO.getTitle(), "Blog contains inappropriate title");
+        moderationService.checkComment(blogRequestDTO.getContent(), "Blog contains inappropriate content");
         Blog blog = blogMapper.toEntity(blogRequestDTO);
         blog.setUser(user);
 
@@ -122,12 +122,12 @@ public class BlogService implements IBlogService{
                 .orElseThrow(() -> new ResourceNotFoundException("Blog not found"));
 
         if (blogRequestDTO.getTitle() != null && !blogRequestDTO.getTitle().isBlank()) {
-            moderationService.checkComment(blogRequestDTO.getTitle());
+            moderationService.checkComment(blogRequestDTO.getTitle(), "Blog contains inappropriate title");
             blog.setTitle(blogRequestDTO.getTitle());
         }
 
         if (blogRequestDTO.getContent() != null && !blogRequestDTO.getContent().isBlank()) {
-            moderationService.checkComment(blogRequestDTO.getContent());
+            moderationService.checkComment(blogRequestDTO.getContent(), "Blog contains inappropriate content");
             blog.setContent(blogRequestDTO.getContent());
         }
 

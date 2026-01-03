@@ -65,7 +65,7 @@ public class BlogCommentService implements IBlogCommentService {
         comment.setBlog(blog);
         comment.setUser(user);
         if (request.getContent() != null && !request.getContent().isBlank()) {
-            moderationService.checkComment(request.getContent());
+            moderationService.checkComment(request.getContent(), "Comment contains inappropriate content");
             comment.setContent(request.getContent());
         }
         comment.setImage(request.getImage());
@@ -88,7 +88,7 @@ public class BlogCommentService implements IBlogCommentService {
                 .orElseThrow(() -> new RuntimeException("Comment not found"));
 
         if (request.getContent() != null && !request.getContent().isBlank()) {
-            moderationService.checkComment(request.getContent());
+            moderationService.checkComment(request.getContent(), "Comment contains inappropriate content");
             comment.setContent(request.getContent());
         }
         if (request.getImage() != null) comment.setImage(request.getImage());

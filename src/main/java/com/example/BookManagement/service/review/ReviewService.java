@@ -66,7 +66,7 @@ public class ReviewService implements IReviewService{
         }
 
         // Check toxic content using AI moderation
-        moderationService.checkComment(request.getComment());
+        moderationService.checkComment(request.getComment(), "Review contains inappropriate content");
 
         Review review = new Review();
         review.setUser(user);
@@ -95,7 +95,7 @@ public class ReviewService implements IReviewService{
 
         if(request.getComment() != null && !request.getComment().isBlank()){
             // Check toxic content before update
-            moderationService.checkComment(request.getComment());
+            moderationService.checkComment(request.getComment(), "Review contains inappropriate content");
             review.setComment(request.getComment());
         }
 

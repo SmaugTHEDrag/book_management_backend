@@ -8,7 +8,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 public interface IAuthService extends UserDetailsService {
 
-    // Register a new user
     UserDTO register(RegisterForm registerForm);
     
 }

@@ -11,27 +11,27 @@ import java.util.Optional;
 
 public interface IReviewRepository extends JpaRepository<Review, Integer> {
 
-    // Get all reviews written by a specific user
+    // all reviews by a user
     List<Review> findByUserId(Integer userId);
 
-    // Get all reviews of specific book
+    // all reviews for a book
     List<Review> findByBookId(Integer bookId);
 
-    // Find a review by user and book (used to prevent duplicate reviews)
+    // review by user for a book (prevent duplicates)
     Optional<Review> findByUserIdAndBookId(Integer userId, Integer bookId);
 
-    // Check if a user has already reviewed a specific book
+    // check if user already reviewed a book
     boolean existsByUserIdAndBookId(Integer userId, Integer bookId);
 
-    // Calculate average rating of a book
+    // average rating of a book
     @Query("SELECT AVG(r.rating) FROM Review r WHERE r.book.id = :bookId")
     Double findAvgRatingByBookId(@Param("bookId") Integer bookId);
 
-    // Count total reviews of a book
+    // total number of reviews for a book
     @Query("SELECT COUNT(r.id) FROM Review r WHERE r.book.id = :bookId")
     Integer getReviewCountByBookId(@Param("bookId") Integer bookId);
 
-    // Get all reviews of a book with user info (avoid N+1 query)
+    // all reviews with user info (avoid N+1)
     @Query("SELECT r FROM Review r JOIN FETCH r.user WHERE r.book.id = :bookId")
     List<Review> findByBookIdWithUser(@Param("bookId") Integer bookId);
 

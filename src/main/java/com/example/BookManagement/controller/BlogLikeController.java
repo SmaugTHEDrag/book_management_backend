@@ -18,14 +18,12 @@ public class BlogLikeController {
 
     private final IBlogLikeService likeService;
 
-    // get total like for a blog
     @Operation(summary = "Get like count")
     @GetMapping("/{blogId}/likes/count")
     public ResponseEntity<Long> getLikeCount(@PathVariable Integer blogId) {
         return ResponseEntity.ok(likeService.getLikeCount(blogId));
     }
 
-    // check if current user liked the blog
     @Operation(summary = "Check user like")
     @GetMapping("/{blogId}/likes/has")
     public ResponseEntity<Boolean> hasUserLiked(@PathVariable Integer blogId, Principal principal) {
@@ -33,7 +31,6 @@ public class BlogLikeController {
         return ResponseEntity.ok(likeService.hasUserLiked(blogId, username));
     }
 
-    // like a blog (idempotent)
     @Operation(summary = "Like a blog")
     @PostMapping("/{blogId}/likes")
     public ResponseEntity<BlogLikeDTO> likeBlog(@PathVariable Integer blogId, Principal principal) {
@@ -42,7 +39,6 @@ public class BlogLikeController {
         return ResponseEntity.ok(dto);
     }
 
-    // Unlike a blog
     @Operation(summary = "Unlike a blog")
     @DeleteMapping("/{blogId}/likes")
     public ResponseEntity<Void> unlikeBlog(@PathVariable Integer blogId, Principal principal) {

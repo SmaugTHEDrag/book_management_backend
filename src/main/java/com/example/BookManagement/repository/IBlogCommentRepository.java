@@ -8,9 +8,9 @@ import java.util.List;
 
 public interface IBlogCommentRepository extends JpaRepository<BlogComment, Integer> {
 
-    // Get all top-level comment (comment without parent comment) for a specific blog
+    // top-level comments of a blog (no replies)
     List<BlogComment> findAllByBlogAndParentCommentIsNull(Blog blog);
 
-    // Get all comments (including replies) for a specific blog
+    // all comments of a blog (have replies)
     List<BlogComment> findAllByBlog(Blog blog);
 }

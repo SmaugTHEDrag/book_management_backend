@@ -33,23 +33,21 @@ public class UserController {
 
     private final IUserService userService;
 
-    // get all users with filters and pagination (Admin only)
-    @Operation(summary = "Get all users")
+    @Operation(summary = "Get all users", description = "Admin can get paginated list of users")
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping
     public ResponseEntity<UserPageResponse> getAllUsers(UserFilterForm form, @PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable pageable){
         return ResponseEntity.ok(userService.getAllUsers(form, pageable));
     }
 
-    // get user by ID
-    @Operation(summary = "Get user by ID")
+    @Operation(summary = "Get user by ID", description = "Only admin can get user by ID")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("{id}")
     public ResponseEntity<UserDTO> getUserById(@PathVariable int id){
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
-    // create a new user (Admin only)
-    @Operation(summary = "Create a new user")
+    @Operation(summary = "Create a new user", description = "Only admin create a new user")
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping
     public ResponseEntity<UserDTO> createUser(@RequestBody @Valid UserRequestDTO userRequestDTO){
@@ -57,7 +55,6 @@ public class UserController {
         return new ResponseEntity<>(createUserDTO,HttpStatus.CREATED);
     }
 
-    // update user info
     @Operation(summary = "Update user info")
     @PutMapping("{id}")
     public ResponseEntity<UserDTO> updateUser(@PathVariable int id, @RequestBody @Valid UserRequestDTO userRequestDTO){
@@ -65,8 +62,7 @@ public class UserController {
         return ResponseEntity.ok(updateUserDTO);
     }
 
-    // update user role (admin only)
-    @Operation(summary = "Update user role")
+    @Operation(summary = "Update user role", description = "Only admin can update user role")
     @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("{id}/role")
     public ResponseEntity<?> updateUserRole(@PathVariable int id, @Valid @RequestBody UpdateRoleDTO updateRoleDTO,
@@ -85,8 +81,7 @@ public class UserController {
         }
     }
 
-    // delete user by ID (Admin only)
-    @Operation(summary = "Delete user")
+    @Operation(summary = "Delete user", description = "Only admin can delete user")
     @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("{id}")
     public ResponseEntity<Object> deleteUser(@PathVariable int id){

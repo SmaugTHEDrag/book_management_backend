@@ -25,21 +25,18 @@ public class BlogController {
 
     private final IBlogService blogService;
 
-    // get all blogs
     @Operation(summary = "Get all blogs")
     @GetMapping
     public ResponseEntity<List<BlogDTO>> getAllBlogs() {
         return ResponseEntity.ok(blogService.getAllBlogs());
     }
 
-    // get one blog by ID
     @Operation(summary = "Get blog by ID")
     @GetMapping("/{id}")
     public ResponseEntity<BlogDTO> getBlogById(@PathVariable int id) {
         return ResponseEntity.ok(blogService.getBlogById(id));
     }
 
-    // create new blog (no image)
     @Operation(summary = "Create a blog")
     @PostMapping
     public ResponseEntity<BlogDTO> createBlog(@Valid @RequestBody BlogRequestDTO blogRequestDTO, Principal principal) {
@@ -47,7 +44,6 @@ public class BlogController {
         return ResponseEntity.ok(blogDTO);
     }
 
-    // create blog with image/file (Cloudinary)
     @Operation(summary = "Create blog with image")
     @PostMapping(value = "/upload", consumes = {"multipart/form-data"})
     public ResponseEntity<BlogDTO> createBlogWithUpload(
@@ -57,13 +53,11 @@ public class BlogController {
             @RequestPart(value = "imageURL", required = false) String imageURL,
             Principal principal
     ) {
-        // file > imageURL if both provided
         BlogDTO created = blogService.createBlogWithUpload(title, content, image, imageURL, principal.getName());
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-    // update blog (Blog owner only)
-    @Operation(summary = "Update a blog")
+    @Operation(summary = "Update a blog", description = "Only Blog owner can update a blog")
     @PreAuthorize("@blogSecurity.isOwner(#id, authentication.name)")
     @PutMapping("/{id}")
     public ResponseEntity<BlogDTO> updateBlog(@PathVariable int id, @RequestBody @Valid BlogRequestDTO blogRequestDTO, Principal principal) {
@@ -71,8 +65,7 @@ public class BlogController {
         return ResponseEntity.ok(blogDTO);
     }
 
-    // delete blog (Blog owner or admin only)
-    @Operation(summary = "Delete a blog")
+    @Operation(summary = "Delete a blog", description = "Only Admin and Blog owner can delete a blog")
     @PreAuthorize("hasAuthority('ADMIN') or @blogSecurity.isOwner(#id, authentication.name)")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBlog(@PathVariable int id, Principal principal) {

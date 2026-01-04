@@ -35,14 +35,12 @@ public class ReviewService implements IReviewService{
 
     private final IAIModerationService moderationService;
 
-    // Get all reviews of a book
     @Override
     public List<ReviewDTO> getReviewsByBook(Integer bookId) {
         List<Review> reviews = reviewRepository.findByBookId(bookId);
         return reviewMapper.toListDTO(reviews);
     }
 
-    // Get all reviews of a user
     @Override
     public List<ReviewDTO> getReviewsByUser(String username) {
         User user = userRepository.findByUsername(username)
@@ -51,7 +49,6 @@ public class ReviewService implements IReviewService{
         return reviewMapper.toListDTO(reviews);
     }
 
-    // Create a new review for a book
     @Override
     public ReviewDTO createReview(String username, ReviewRequestDTO request) {
         User user = userRepository.findByUsername(username)
@@ -60,12 +57,12 @@ public class ReviewService implements IReviewService{
         Book book = bookRepository.findById(request.getBookId())
                 .orElseThrow(()-> new ResourceNotFoundException("Book not found"));
 
-        // Prevent duplicate review
+        // one user can only review a book once
         if(reviewRepository.existsByUserIdAndBookId(user.getId(), book.getId())){
             throw new IllegalStateException("You already reviewed this book");
         }
 
-        // Check toxic content using AI moderation
+        // check toxic content using external moderation
         moderationService.checkComment(request.getComment(), "Review contains inappropriate content");
 
         Review review = new Review();
@@ -78,13 +75,12 @@ public class ReviewService implements IReviewService{
         return reviewMapper.toDTO(savedReview);
     }
 
-    // Update a review
     @Override
     public ReviewDTO updateReview(Integer id, String username, ReviewRequestDTO request) {
         Review review = reviewRepository.findById(id)
                 .orElseThrow(()-> new ResourceNotFoundException("Review not found"));
 
-        // Only review owner can update
+        // only review owner can update
         if (!review.getUser().getUsername().equals(username)) {
             throw new IllegalStateException("You are not allowed to update this review");
         }
@@ -94,7 +90,7 @@ public class ReviewService implements IReviewService{
         }
 
         if(request.getComment() != null && !request.getComment().isBlank()){
-            // Check toxic content before update
+            // check toxic content before update
             moderationService.checkComment(request.getComment(), "Review contains inappropriate content");
             review.setComment(request.getComment());
         }
@@ -103,7 +99,6 @@ public class ReviewService implements IReviewService{
         return reviewMapper.toDTO(updatedReview);
     }
 
-    // Delete a review
     @Override
     public void deleteReview(Integer id, String username) {
         Review review = reviewRepository.findById(id)

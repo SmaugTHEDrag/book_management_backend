@@ -8,12 +8,12 @@ import java.util.Optional;
 
 public interface IFavoriteRepository extends JpaRepository<Favorite, Integer> {
 
-    // Get all favorite books of specific user
+    // all favorites of a user
     List<Favorite> findByUserId(Integer userId);
 
-    // Find a specific favorite entry by user ID and book ID
+    // favorite entry for a user and book
     Optional<Favorite> findByUserIdAndBookId(Integer userId, Integer bookId);
 
-    // Check if a user has already added favorite a specific book
+    // check if user already favorited the book
     boolean existsByUserIdAndBookId(Integer userId, Integer bookId);
 }

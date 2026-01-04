@@ -11,7 +11,7 @@ public class BlogSecurity {
 
     private final IBlogRepository blogRepository;
 
-    // Check if the given blog belongs to the current user
+    // check if the given blog belongs to the current user
     public boolean isOwner(int blogId, String username) {
         return blogRepository.findById(blogId)
                 .map(blog -> blog.getUser().getUsername().equals(username))

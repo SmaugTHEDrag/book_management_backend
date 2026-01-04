@@ -31,7 +31,7 @@ public class LoginController {
     @Operation(summary = "User login")
     @PostMapping
     public ResponseEntity<Object> login(@RequestBody @Valid LoginForm loginForm) {
-        // authenticate the user
+        // authenticate user credentials
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginForm.getLogin(), loginForm.getPassword())
         );

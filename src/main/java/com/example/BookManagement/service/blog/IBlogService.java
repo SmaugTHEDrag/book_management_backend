@@ -9,21 +9,18 @@ import java.util.List;
 
 public interface IBlogService {
 
-    // Get all blogs
     List<BlogDTO> getAllBlogs();
 
-    // Get blog by ID
     BlogDTO getBlogById(int id);
 
-    // Create a new blog (no image)
     BlogDTO createBlog(BlogRequestDTO requestDTO, String username);
 
-    // Update an existing blog
+    // only blog owner can update
     BlogDTO updateBlog(int id, BlogRequestDTO requestDTO, String username);
 
-    // Delete a blog by ID
+    // blog owner and admin check before delete
     void deleteBlog(int id, String username);
 
-    // Upload a blog with upload to Cloudinary
+    // create blog and upload image if provided
     BlogDTO createBlogWithUpload(String title, String content, MultipartFile image, String imageURL, String username);
 }

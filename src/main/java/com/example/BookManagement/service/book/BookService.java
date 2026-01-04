@@ -40,39 +40,33 @@ public class BookService implements IBookService {
 
     private final ReviewMapper reviewMapper;
 
-    // Map Book entity to DTO with rating & reviews
+    // map Book entity to DTO with rating & reviews
     private BookDTO mapToBookDTOWithRating(Book book) {
         BookDTO dto = bookMapper.toDTO(book);
 
-        // Average rating
+        // average rating
         Double avgRating = reviewRepository.findAvgRatingByBookId(book.getId());
         dto.setAvgRating(avgRating != null ? avgRating : 0.0);
 
-        // Total reviews
+        // total reviews
         Integer reviewCount = reviewRepository.getReviewCountByBookId(book.getId());
         dto.setReviewCount(reviewCount !=null ? reviewCount:0);
 
-        // Reviews with user info
+        // load reviews with user info
         List<Review> reviews = reviewRepository.findByBookIdWithUser(book.getId());
         dto.setReviews(reviewMapper.toListDTO(reviews));
 
         return dto;
     }
 
-    // Get paginated books with filters
     @Override
     public BookPageResponse getAllBooks(BookFilterForm form, Pageable pageable) {
-
-        // Build search/filter conditions
         Specification<Book> where = BookSpecification.buildWhere(form);
 
-        // Query with pagination
         Page<Book> books = bookRepository.findAll(where, pageable);
 
-        // Map entities to DTOs
         Page<BookDTO> bookDTOs = books.map(this::mapToBookDTOWithRating);
 
-        // Wrap pagination metadata
         return new BookPageResponse(
             bookDTOs.getContent(),
             bookDTOs.getNumber(),
@@ -84,26 +78,14 @@ public class BookService implements IBookService {
         );
     }
 
-    // Get a book by ID
     @Override
     public BookDTO getBookById(int id) {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Book not found"));
 
-        BookDTO dto = bookMapper.toDTO(book);
-
-        // Rating summary
-        Double avgRating = reviewRepository.findAvgRatingByBookId(id);
-        dto.setAvgRating(avgRating != null ? avgRating : 0.0);
-
-        Integer reviewCount = reviewRepository.getReviewCountByBookId(id);
-        dto.setReviewCount(reviewCount !=null ? reviewCount:0);
-
-        return dto;
+        return mapToBookDTOWithRating(book);
     }
 
-
-    // Creates a new book
     @Override
     public BookDTO createBook(BookRequestDTO bookRequestDTO) {
         Book book = bookMapper.toEntity(bookRequestDTO);
@@ -111,30 +93,29 @@ public class BookService implements IBookService {
         return bookMapper.toDTO(savedBook);
     }
 
-    // Updates an existing book
     @Override
     public BookDTO updateBook(int id, BookRequestDTO bookRequestDTO) {
         Book existingBook = bookRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Book not found with id: " + id));
 
-        // Apply changes from DTO
         bookMapper.updateEntityFromDTO(bookRequestDTO, existingBook);
 
         Book updatedBook = bookRepository.save(existingBook);
         return bookMapper.toDTO(updatedBook);
     }
 
-    // Deletes a book by ID
     @Override
     public void deleteBook(int id) {
+        if (!bookRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Book not found");
+        }
         bookRepository.deleteById(id);
     }
 
-    // Create book with file upload (image + pdf)
+    // create book with file upload (image + pdf)
     @Override
     public BookDTO createBookWithUpload(String title, String author, String category, String description, MultipartFile image, MultipartFile pdf) {
         try {
-            // Upload PDF
             String pdfUrl = fileUploadService.uploadFile(pdf, "books/pdfs");
 
             // Upload image if provided

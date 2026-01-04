@@ -38,12 +38,12 @@ public class BlogService implements IBlogService{
 
     private final IAIModerationService moderationService;
 
-    // Convert BlogComment entity to DTO (includes nested replies)
+    // map comment with recursive replies
     private BlogCommentDTO mapComment(BlogComment comment) {
         BlogCommentDTO dto = blogMapper.toCommentDto(comment);
         dto.setUsername(comment.getUser().getUsername());
 
-        // Map replies if available
+        // map replies if available
         if (comment.getChildComment() != null && !comment.getChildComment().isEmpty()) {
             dto.setReplies(comment.getChildComment().stream()
                     .map(this::mapComment)
@@ -55,14 +55,14 @@ public class BlogService implements IBlogService{
         return dto;
     }
 
-    // Convert Blog entity to DTO (includes top-level comments and like count)
+    // build blog dto with comments and like count
     private BlogDTO mapBlogWithComments(Blog blog) {
         BlogDTO dto = blogMapper.toDTO(blog);
 
-        // Set like count
+        // simple like count, no extra query
         dto.setLikeCount(blog.getBlogLikes() != null ? (long) blog.getBlogLikes().size() : 0);
 
-        // Map only top-level comments
+        // only load top-level comments
         if (blog.getBlogComments() != null) {
             dto.setComments(blog.getBlogComments().stream()
                     .filter(c -> c.getParentComment() == null)   // only top-level
@@ -75,7 +75,6 @@ public class BlogService implements IBlogService{
         return dto;
     }
 
-    // Get all blogs with their comments and like counts.
     @Override
     public List<BlogDTO> getAllBlogs() {
         return blogRepository.findAll().stream()
@@ -83,7 +82,6 @@ public class BlogService implements IBlogService{
                 .collect(Collectors.toList());
     }
 
-    // Get a blog by ID.
     @Override
     public BlogDTO getBlogById(int id) {
         Blog blog = blogRepository.findById(id)
@@ -91,8 +89,6 @@ public class BlogService implements IBlogService{
         return mapBlogWithComments(blog);
     }
 
-
-    // Create a new blog post (no image)
     @Override
     public BlogDTO createBlog(BlogRequestDTO blogRequestDTO, String username) {
         User user = userRepository.findByUsername(username)
@@ -106,8 +102,10 @@ public class BlogService implements IBlogService{
             throw new IllegalArgumentException("Content is required");
         }
 
+        // check content before saving
         moderationService.checkComment(blogRequestDTO.getTitle(), "Blog contains inappropriate title");
         moderationService.checkComment(blogRequestDTO.getContent(), "Blog contains inappropriate content");
+
         Blog blog = blogMapper.toEntity(blogRequestDTO);
         blog.setUser(user);
 
@@ -115,7 +113,6 @@ public class BlogService implements IBlogService{
         return blogMapper.toDTO(saved);
     }
 
-    // Update a blog
     @Override
     public BlogDTO updateBlog(int id, BlogRequestDTO blogRequestDTO, String username) {
         Blog blog = blogRepository.findById(id)
@@ -139,7 +136,6 @@ public class BlogService implements IBlogService{
         return blogMapper.toDTO(updatedBlog);
     }
 
-    // Delete a blog post by ID
     @Override
     public void deleteBlog(int id, String username) {
         Blog blog = blogRepository.findById(id)
@@ -152,13 +148,18 @@ public class BlogService implements IBlogService{
     public BlogDTO createBlogWithUpload(String title, String content, MultipartFile image, String imageURL, String username) {
         try {
             String uploadedImageUrl = null;
+
+            // upload image if file exists
             if(image != null && !image.isEmpty()){
                 uploadedImageUrl = fileUploadService.uploadFile(image, "blogs/images");
-            } else if (imageURL != null && !imageURL.isBlank()){
+            }
+
+            // fallback to external image url
+            else if (imageURL != null && !imageURL.isBlank()){
                 uploadedImageUrl = imageURL;
             }
-            BlogRequestDTO dto = new BlogRequestDTO(title, content, uploadedImageUrl);
 
+            BlogRequestDTO dto = new BlogRequestDTO(title, content, uploadedImageUrl);
             return createBlog(dto, username);
         } catch (RuntimeException | IOException e) {
             throw new RuntimeException(e);

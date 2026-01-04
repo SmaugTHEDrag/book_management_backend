@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class UserFilterForm {
 
-    // Filter by specific fields
+    // Search by specific fields
     private String usernameSearch;
     private String emailSearch;
     private String roleSearch;

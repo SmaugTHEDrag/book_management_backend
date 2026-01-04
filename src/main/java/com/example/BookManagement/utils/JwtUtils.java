@@ -13,26 +13,25 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-// JWT utility for creating and validating tokens
+// jwt helper used by spring security filter
 public class JwtUtils {
 
-    // Token expires in 30 days
     private static final long EXPIRE_TIME = 30 * 24 * 60 * 60 * 1000L;
 
-    // Secret key for signing the JWT (HS512)
+    // key length is required for HS512, currently hardcoded
     private static final String SECRET = "ThisIsASecretKeyForJwtThatIsAtLeastSixtyFourCharactersLong123456!";
     private static final SecretKey SECRET_KEY = Keys.hmacShaKeyFor(SECRET.getBytes());
 
-    // Generate a JWT for the authenticated user
+    // generate a JWT for the authenticated user
     public static String generateJwt(Authentication authentication) {
         User user = (User) authentication.getPrincipal();
 
-        // Extract roles from the user's authorities
+        // put roles into token for later authorization
         List<String> roles = user.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
-        // Build the JWT
+        // build the JWT
         return Jwts.builder()
                 .setSubject(user.getUsername())  // username
                 .claim("roles", roles)  // role
@@ -41,7 +40,6 @@ public class JwtUtils {
                 .compact();
     }
 
-    // Validate a JWT token
     public static boolean validateJwt(String jwt) {
         try {
             Jwts.parserBuilder()

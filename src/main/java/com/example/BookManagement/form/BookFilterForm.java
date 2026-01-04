@@ -8,7 +8,7 @@ import java.util.Date;
 @Data
 public class BookFilterForm {
 
-    // Filter by specific fields
+    // Search by specific fields
     private String titleSearch;
     private String authorSearch;
     private String categorySearch;

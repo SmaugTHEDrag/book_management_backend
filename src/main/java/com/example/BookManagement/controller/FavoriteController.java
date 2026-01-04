@@ -22,22 +22,19 @@ public class FavoriteController {
 
     private final IFavoriteService favoriteService;
 
-    // get all favorites for the current user
-    @Operation(summary = "Get all favorites")
+    @Operation(summary = "Get all favorite books of the current user")
     @GetMapping
     public ResponseEntity<List<FavoriteDTO>> getFavorites(Principal principal) {
         return ResponseEntity.ok(favoriteService.getAllFavorites(principal.getName()));
     }
 
-    // add a book to favorite
-    @Operation(summary = "Add favorite")
+    @Operation(summary = "Add favorite to current user's favorites")
     @PostMapping
     public ResponseEntity<FavoriteDTO> addFavorite(@RequestBody @Valid FavoriteRequestDTO request, Principal principal) {
         return ResponseEntity.ok(favoriteService.addFavorite(request, principal.getName()));
     }
 
-    // remove a book from favorite
-    @Operation(summary = "Remove favorite")
+    @Operation(summary = "Remove favorite from current user's favorites")
     @DeleteMapping("/{bookId}")
     public ResponseEntity<?> removeFavorite(@PathVariable Integer bookId, Principal principal) {
         favoriteService.removeFavorite(bookId, principal.getName());

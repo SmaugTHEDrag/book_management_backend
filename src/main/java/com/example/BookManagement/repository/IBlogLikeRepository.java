@@ -10,15 +10,15 @@ import java.util.Optional;
 
 public interface IBlogLikeRepository extends JpaRepository<BlogLike, Integer> {
 
-    // Find a like on blog and by user
+    // find like by blog and user
     Optional<BlogLike> findByBlogAndUser(Blog blog, User user);
 
-    // Check if a specific user has liked a specific blog
+    // check if user already liked the blog
     boolean existsByBlogAndUser(Blog blog, User user);
 
-    // Count the total number of likes for a specific blog
+    // count total likes for a blog
     long countByBlog(Blog blog);
 
-    // Get all likes for a specific blog
+    // all likes of a blog
     List<BlogLike> findAllByBlog(Blog blog);
 }

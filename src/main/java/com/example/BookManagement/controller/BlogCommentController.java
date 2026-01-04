@@ -22,14 +22,12 @@ public class BlogCommentController {
 
     private final IBlogCommentService commentService;
 
-    // get all comments for a blog (top-level + replies)
     @Operation(summary = "Get comments for a blog")
     @GetMapping("/{blogId}/comments")
     public ResponseEntity<List<BlogCommentDTO>> getComments(@PathVariable Integer blogId) {
         return ResponseEntity.ok(commentService.getCommentsByBlog(blogId));
     }
 
-    // add a new comment or reply to a blog
     @Operation(summary = "Add a comment")
     @PostMapping("/{blogId}/comments")
     public ResponseEntity<BlogCommentDTO> addComment(@RequestBody @Valid BlogCommentRequestDTO request, Principal principal) {
@@ -37,8 +35,7 @@ public class BlogCommentController {
         return ResponseEntity.ok(commentService.addComment(request, username));
     }
 
-    // update a comment (Comment owner only)
-    @Operation(summary = "Update comment")
+    @Operation(summary = "Update comment", description = "Only Comment owner can update a comment")
     @PreAuthorize("@commentSecurity.canEdit(#commentId, authentication.name)")
     @PutMapping("/comments/{commentId}")
     public ResponseEntity<BlogCommentDTO> updateComment(@PathVariable Integer commentId, @RequestBody @Valid BlogCommentRequestDTO request, Principal principal) {
@@ -46,8 +43,7 @@ public class BlogCommentController {
         return ResponseEntity.ok(commentService.updateComment(commentId, request, username));
     }
 
-    // delete a comment (Blog owner, admin and Comment owner)
-    @Operation(summary = "Delete comment")
+    @Operation(summary = "Delete comment", description = "Only Blog owner, Admin and Comment owner can delete a comment")
     @PreAuthorize("hasAuthority('ADMIN') or @commentSecurity.canDelete(#commentId, authentication.name)")
     @DeleteMapping("/comments/{commentId}")
     public ResponseEntity<Void> deleteComment(@PathVariable Integer commentId, Principal principal) {

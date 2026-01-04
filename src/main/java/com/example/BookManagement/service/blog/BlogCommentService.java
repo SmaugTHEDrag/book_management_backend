@@ -36,13 +36,16 @@ public class BlogCommentService implements IBlogCommentService {
 
     private final IAIModerationService moderationService;
 
-    // Convert comment entity to DTO (including replies)
+    // recursive mapping for nested replies
     private BlogCommentDTO mapToCommentDTO(BlogComment blogComment) {
         BlogCommentDTO dto = blogCommentMapper.toDTO(blogComment);
+
         if (blogComment.getUser() != null) {
             dto.setUsername(blogComment.getUser().getUsername());
         }
+
         dto.setBlogId(blogComment.getBlog() != null ? blogComment.getBlog().getId() : null);
+
         if (blogComment.getChildComment() != null) {
             dto.setReplies(blogComment.getChildComment().stream()
                     .map(this::mapToCommentDTO)
@@ -50,38 +53,41 @@ public class BlogCommentService implements IBlogCommentService {
         } else {
             dto.setReplies(Collections.emptyList());
         }
+
         return dto;
     }
 
-    // Add new comment or reply
+    // add new comment or reply
     @Override
     public BlogCommentDTO addComment(BlogCommentRequestDTO request, String username) {
         Blog blog = blogRepository.findById(request.getBlogId())
                 .orElseThrow(() -> new RuntimeException("Blog not found"));
+
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         BlogComment comment = new BlogComment();
         comment.setBlog(blog);
         comment.setUser(user);
+
         if (request.getContent() != null && !request.getContent().isBlank()) {
             moderationService.checkComment(request.getContent(), "Comment contains inappropriate content");
             comment.setContent(request.getContent());
         }
+
         comment.setImage(request.getImage());
 
         if (request.getParentCommentId() != null) {
             BlogComment parent = commentRepository.findById(request.getParentCommentId())
                     .orElseThrow(() -> new RuntimeException("Parent comment not found"));
             comment.setParentComment(parent);
-            // parent.childComment
         }
 
         BlogComment saved = commentRepository.save(comment);
         return mapToCommentDTO(saved);
     }
 
-    // Update comment content or image
+    // update content or image only
     @Override
     public BlogCommentDTO updateComment(Integer commentId, BlogCommentRequestDTO request, String username) {
         BlogComment comment = commentRepository.findById(commentId)
@@ -91,14 +97,17 @@ public class BlogCommentService implements IBlogCommentService {
             moderationService.checkComment(request.getContent(), "Comment contains inappropriate content");
             comment.setContent(request.getContent());
         }
-        if (request.getImage() != null) comment.setImage(request.getImage());
+
+        if (request.getImage() != null) {
+            comment.setImage(request.getImage());
+        }
 
         BlogComment updated = commentRepository.save(comment);
         return mapToCommentDTO(updated);
     }
 
 
-    // Delete a comment
+    // privilege before delete a comment
     @Override
     public void deleteComment(Integer commentId, String username) {
         BlogComment comment = commentRepository.findById(commentId)
@@ -107,7 +116,7 @@ public class BlogCommentService implements IBlogCommentService {
     }
 
 
-    // Get comments of a blog (only top-level, replies included)
+    // load top-level comments with replies
     @Override
     public List<BlogCommentDTO> getCommentsByBlog(Integer blogId) {
         Blog blog = blogRepository.findById(blogId)

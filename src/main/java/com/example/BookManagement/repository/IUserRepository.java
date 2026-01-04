@@ -9,15 +9,15 @@ import java.util.Optional;
 
 public interface IUserRepository extends JpaRepository<User, Integer>, JpaSpecificationExecutor<User> {
 
-    // Find a user by their username
+    // find user by username
     Optional<User> findByUsername(String username);
 
-    // Find a user by their email
+    // find user by email
     Optional<User> findByEmail(String email);
 
-    // Check if a user with the given username already exists
+    // check if username exists
     boolean existsByUsername(String username);
 
-    // Check if a user with the given email already exists
+    // check if email exists
     boolean existsByEmail(String email);
 }

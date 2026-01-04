@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Ping API", description = "API for monitoring backend uptime using UptimeRobot")
 public class PingController {
 
-    // Return "OK" if the service is running
     @Operation(summary = "Ping backend service")
     @GetMapping("/ping")
     public String ping(){

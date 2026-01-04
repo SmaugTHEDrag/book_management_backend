@@ -31,7 +31,6 @@ public class BlogLikeService implements IBlogLikeService{
 
     private final BlogLikeMapper blogLikeMapper;
 
-    // Like blog (return existing like if already liked)
     @Override
     public BlogLikeDTO likeBlog(Integer blogId, String username) {
         Blog blog = blogRepository.findById(blogId)
@@ -54,7 +53,6 @@ public class BlogLikeService implements IBlogLikeService{
     }
 
 
-    // Unlike blog
     @Override
     public void unlikeBlog(Integer blogId, String username) {
         Blog blog = blogRepository.findById(blogId)
@@ -69,7 +67,6 @@ public class BlogLikeService implements IBlogLikeService{
         likeRepository.delete(like);
     }
 
-    // Count likes of a blog
     @Override
     public long getLikeCount(Integer blogId) {
         Blog blog = blogRepository.findById(blogId)
@@ -77,7 +74,6 @@ public class BlogLikeService implements IBlogLikeService{
         return likeRepository.countByBlog(blog);
     }
 
-    // Check if user liked blog
     @Override
     public boolean hasUserLiked(Integer blogId, String username) {
         Blog blog = blogRepository.findById(blogId)

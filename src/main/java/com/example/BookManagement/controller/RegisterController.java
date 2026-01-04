@@ -28,11 +28,9 @@ public class RegisterController {
 
     private final IAuthService userService;
 
-    // registers a new user
     @Operation(summary = "Register a new user")
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterForm registerForm, BindingResult bindingResult) {
-        // Check for validation errors
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = new HashMap<>();
             for (FieldError error : bindingResult.getFieldErrors()) {
@@ -41,11 +39,10 @@ public class RegisterController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
         }
         try {
-            // Attempt to register the user via service layer
             UserDTO createdUser = userService.register(registerForm);
             return ResponseEntity.ok(createdUser); // return created user DTO
         } catch (RuntimeException e) {
-            // Handle exceptions such as username/email already taken
+            // throws exception if username/email already exists
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
         }
     }

@@ -10,9 +10,8 @@
 [![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://reactjs.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.109-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![MySQL](https://img.shields.io/badge/MySQL-Aiven_Cloud-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://mysql.com/)
-[![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
 
-**[🌐 Live Demo](https://ptn-book-storage.netlify.app/)** •
+**[🌐 Live Demo](https://book-management-frontend-ecru.vercel.app/)** •
 **[📖 API Docs](https://book-management-backend-d481.onrender.com/swagger-ui/index.html)** •
 **[🎥 Demo Video](https://www.youtube.com/watch?v=uis-1R07yUM)**
 
@@ -188,7 +187,7 @@ npm run dev
 <div align="center">
 
 ### 🌐 **Live Application**
-[![Frontend](https://img.shields.io/badge/Frontend-Netlify-00C7B7?style=for-the-badge&logo=netlify)](https://ptn-book-storage.netlify.app/)
+[![Frontend](https://img.shields.io/badge/Frontend-Vercel-00C7B7?style=for-the-badge&logo=vercel)](https://book-management-frontend-ecru.vercel.app/)
 [![Backend](https://img.shields.io/badge/Backend-Render-46E3B7?style=for-the-badge&logo=render)](https://book-management-backend-d481.onrender.com/swagger-ui/index.html)
 [![FastAPI](https://img.shields.io/badge/ML%20Service-Render-96EA2D?style=for-the-badge&logo=render)](https://simple-ai-moderation.onrender.com/docs)
 [![API Docs](https://img.shields.io/badge/API%20Docs-Swagger-85EA2D?style=for-the-badge&logo=swagger)](https://book-management-backend-d481.onrender.com/swagger-ui/index.html)

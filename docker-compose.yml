@@ -1,0 +1,134 @@
+services:
+
+  # ============================================================
+  # PostgreSQL - Book Management Application
+  # ============================================================
+  postgres:
+    image: postgres:17
+    container_name: bookmanagement-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: book_management
+      POSTGRES_USER: bookmanagement
+      POSTGRES_PASSWORD: bookmanagement123
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - bookmanagement-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bookmanagement -d book_management"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+  # ============================================================
+  # PostgreSQL - Keycloak
+  # ============================================================
+  keycloak-postgres:
+    image: postgres:17
+    container_name: bookmanagement-keycloak-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak
+    ports:
+      - "5434:5432"
+    volumes:
+      - keycloak_postgres_data:/var/lib/postgresql/data
+    networks:
+      - bookmanagement-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U keycloak -d keycloak"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+  # ============================================================
+  # Redis
+  # ============================================================
+  redis:
+    image: redis:8-alpine
+    container_name: bookmanagement-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+    volumes:
+      - redis_data:/data
+    networks:
+      - bookmanagement-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+  # ============================================================
+  # RedisInsight
+  # ============================================================
+  redisinsight:
+    image: redis/redisinsight:latest
+    container_name: bookmanagement-redisinsight
+    restart: unless-stopped
+    ports:
+      - "5540:5540"
+    volumes:
+      - redisinsight_data:/data
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - bookmanagement-network
+
+
+  # ============================================================
+  # Keycloak
+  # ============================================================
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: bookmanagement-keycloak
+    restart: unless-stopped
+    command:
+      - start-dev
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak-postgres:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: keycloak
+
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+    ports:
+      - "8180:8080"
+    depends_on:
+      keycloak-postgres:
+        condition: service_healthy
+    networks:
+      - bookmanagement-network
+
+
+# ==============================================================
+# Volumes
+# ==============================================================
+volumes:
+  postgres_data:
+  keycloak_postgres_data:
+  redis_data:
+  redisinsight_data:
+
+
+# ==============================================================
+# Network
+# ==============================================================
+networks:
+  bookmanagement-network:
+    driver: bridge

@@ -19,4 +19,6 @@ public interface IUserRepository extends JpaRepository<User, Integer>, JpaSpecif
 
     // check if email exists
     boolean existsByEmail(String email);
+
+    Optional<User> findByKeycloakUserId(String keycloakUserId);
 }

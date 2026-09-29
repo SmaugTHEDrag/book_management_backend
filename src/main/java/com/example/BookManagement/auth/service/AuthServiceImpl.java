@@ -1,67 +1,68 @@
 package com.example.BookManagement.auth.service;
 
-import com.example.BookManagement.user.dto.UserDTO;
-import com.example.BookManagement.user.entity.Role;
-import com.example.BookManagement.user.entity.User;
+import com.example.BookManagement.auth.dto.LoginResponse;
+import com.example.BookManagement.auth.form.LoginForm;
 import com.example.BookManagement.auth.form.RegisterForm;
-import com.example.BookManagement.auth.mapper.AuthMapper;
-import com.example.BookManagement.user.repository.IUserRepository;
-import jakarta.transaction.Transactional;
+import com.example.BookManagement.user.dto.UserDTO;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.Map;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
-@Slf4j
-public class AuthServiceImpl implements AuthService, UserDetailsService {
+public class AuthServiceImpl implements AuthService {
 
-    private final IUserRepository userRepository;
+    @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
+    private String keycloakIssuerUri;
 
-    private final AuthMapper authMapper;
+    @Value("${keycloak.client-id}")
+    private String clientId;
 
-    private final BCryptPasswordEncoder passwordEncoder;
+    private final RestTemplate restTemplate = new RestTemplate();
 
     @Override
     public UserDTO register(RegisterForm registerForm) {
-        if (userRepository.existsByUsername(registerForm.getUsername())) {
-            throw new IllegalArgumentException("Username already exists");
+        throw new UnsupportedOperationException("Đăng ký tài khoản trực tiếp qua Keycloak UI hoặc Keycloak Admin API.");
+    }
+
+    public LoginResponse proxyLogin(LoginForm loginForm) {
+        String tokenEndpoint = keycloakIssuerUri + "/protocol/openid-connect/token";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("grant_type", "password");
+        body.add("client_id", clientId);
+        body.add("username", loginForm.getLogin());
+        body.add("password", loginForm.getPassword());
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
+
+        try {
+            ResponseEntity<Map> response = restTemplate.postForEntity(tokenEndpoint, request, Map.class);
+            Map<String, Object> responseBody = response.getBody();
+
+            LoginResponse loginResponse = new LoginResponse();
+            loginResponse.setToken((String) responseBody.get("access_token"));
+            loginResponse.setLogin(loginForm.getLogin());
+            loginResponse.setType("Bearer");
+            return loginResponse;
+        } catch (Exception e) {
+            throw new RuntimeException("Xác thực thất bại: Sai thông tin đăng nhập hoặc Keycloak chưa bật Direct Access Grants cho client.", e);
         }
-
-        if (userRepository.existsByEmail(registerForm.getEmail())) {
-            throw new IllegalArgumentException("Email already exists");
-        }
-
-        User user = authMapper.toUserEntity(registerForm);
-        user.setPassword(passwordEncoder.encode(registerForm.getPassword()));
-
-        // Default role is CUSTOMER
-        Role role = Role.CUSTOMER;
-        if (registerForm.getRole() != null) {
-            role = Role.valueOf(registerForm.getRole().toUpperCase());
-        }
-        user.setRole(role);
-
-        User savedUser = userRepository.save(user);
-        return authMapper.toDTO(savedUser);
     }
 
     @Override
-    public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
-        User user = login.contains("@")
-                ? userRepository.findByEmail(login).orElseThrow(() -> new UsernameNotFoundException("Email not found"))
-                : userRepository.findByUsername(login).orElseThrow(() -> new UsernameNotFoundException("Username not found"));
-
-        return new org.springframework.security.core.userdetails.User(
-                user.getUsername(),
-                user.getPassword(),
-                AuthorityUtils.createAuthorityList(user.getRole().toString())
-        );
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        throw new UsernameNotFoundException("Spring Security hiện sử dụng OAuth2 Resource Server kiểm tra JWT trực tiếp.");
     }
 }

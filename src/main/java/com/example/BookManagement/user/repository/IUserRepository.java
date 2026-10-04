@@ -8,17 +8,10 @@ import java.util.Optional;
 
 public interface IUserRepository extends JpaRepository<User, Integer>, JpaSpecificationExecutor<User> {
 
-    // find user by username
+    // find user by username (public profile lookups)
     Optional<User> findByUsername(String username);
 
-    // find user by email
-    Optional<User> findByEmail(String email);
-
-    // check if username exists
-    boolean existsByUsername(String username);
-
-    // check if email exists
-    boolean existsByEmail(String email);
-
+    // find user by the Keycloak subject ("sub") stored in the token
     Optional<User> findByKeycloakUserId(String keycloakUserId);
 }
+

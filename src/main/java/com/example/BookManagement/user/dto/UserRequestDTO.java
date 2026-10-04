@@ -6,28 +6,25 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+/**
+ * Application profile data an admin may change.
+ * Identity (keycloak_user_id), username and password live in Keycloak.
+ */
 @Data
 public class UserRequestDTO {
-
-    @NotBlank(message = "Username does not blank")
-    @Size(min = 6, max = 20, message = "Username from 6 to 20 letters")
-    @Pattern(regexp = "^[a-zA-Z0-9_]+$", message = "Username just have words, number, underline '_'")
-    private String username;
-
-    @NotBlank(message = "Password does not blank")
-    @Size(min = 8, message = "Password must have at least 8 letters")
-    @Pattern.List({
-            @Pattern(regexp = ".*[A-Z].*", message = "Password must have at least 1 upper letter"),
-            @Pattern(regexp = ".*\\d.*", message = "Password must have at least 1 number"),
-            @Pattern(regexp = ".*[!@#$%^&*()_+\\-=].*", message = "Password must have at least 1 special symbol")
-    })
-    private String password;
 
     @NotBlank(message = "Email does not blank")
     @Email(message = "Email is valid")
     private String email;
 
-    @NotBlank(message = "Role cannot be blank")
-    @Pattern(regexp = "ADMIN|CUSTOMER", message = "Role must be either ADMIN or CUSTOMER")
-    private String role;
+    @Size(max = 255, message = "Full name must not be longer than 255 characters")
+    private String fullName;
+
+    @Size(max = 500, message = "Avatar URL must not be longer than 500 characters")
+    private String avatarUrl;
+
+    @NotBlank(message = "Status cannot be blank")
+    @Pattern(regexp = "ACTIVE|SUSPENDED", message = "Status must be either ACTIVE or SUSPENDED")
+    private String status;
 }
+

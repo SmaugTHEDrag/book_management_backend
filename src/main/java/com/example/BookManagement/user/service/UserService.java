@@ -1,10 +1,8 @@
 package com.example.BookManagement.user.service;
 
-import com.example.BookManagement.user.dto.UpdateRoleDTO;
 import com.example.BookManagement.user.dto.UserDTO;
 import com.example.BookManagement.user.dto.UserPageResponse;
 import com.example.BookManagement.user.dto.UserRequestDTO;
-import com.example.BookManagement.user.entity.Role;
 import com.example.BookManagement.user.entity.User;
 import com.example.BookManagement.common.exception.ResourceNotFoundException;
 import com.example.BookManagement.user.form.UserFilterForm;
@@ -19,8 +17,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
+/**
+ * Admin side of the application users.
+ * Roles are Keycloak roles and are intentionally not managed here.
+ */
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -58,16 +58,7 @@ public class UserService implements IUserService{
         return userMapper.toDTO(user);
     }
 
-    // Creates new user.
-    @Override
-    public UserDTO createUser(UserRequestDTO userRequestDTO) {
-        User user = userMapper.toEntity(userRequestDTO);
-        User savedUser = userRepository.save(user);
-
-        return userMapper.toDTO(savedUser);
-    }
-
-    // Update user information
+    // Update the application profile of an existing user
     @Override
     public UserDTO updateUser(int id, UserRequestDTO userRequestDTO) {
         User existingUser = userRepository.findById(id)
@@ -82,20 +73,11 @@ public class UserService implements IUserService{
     // Deletes user by ID
     @Override
     public void deleteUser(int id) {
+        if (!userRepository.existsById(id)) {
+            throw new ResourceNotFoundException("User not found with id: "+id);
+        }
         userRepository.deleteById(id);
     }
 
-    // Update user role
-    @Override
-    public void updateUserRole(int id, UpdateRoleDTO updateRoleDTO) {
-        Optional<User> optionalUser = userRepository.findById(id);
-        if (optionalUser.isEmpty()) {
-            throw new RuntimeException("User not found with ID: " + id);
-        }
-
-        User user = optionalUser.get();
-        user.setRole(Role.valueOf(updateRoleDTO.getRole()));
-        userRepository.save(user);
-    }
-
 }
+

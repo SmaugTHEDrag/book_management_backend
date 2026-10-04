@@ -1,6 +1,5 @@
 package com.example.BookManagement.user.service;
 
-import com.example.BookManagement.user.dto.UpdateRoleDTO;
 import com.example.BookManagement.user.dto.UserDTO;
 import com.example.BookManagement.user.dto.UserPageResponse;
 import com.example.BookManagement.user.dto.UserRequestDTO;
@@ -15,17 +14,10 @@ public interface IUserService  {
     // Get a user by ID
     UserDTO getUserById(int id);
 
-    // Create a new user
-    UserDTO createUser(UserRequestDTO userRequestDTO);
-
-    // Update an existing user
+    // Update the application profile of an existing user
     UserDTO updateUser(int id, UserRequestDTO userRequestDTO);
 
     // Delete a user by ID
     void deleteUser(int id);
-
-    // Update a user's role
-    void updateUserRole(int id, UpdateRoleDTO updateRoleDTO);
-
-
 }
+

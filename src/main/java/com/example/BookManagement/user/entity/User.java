@@ -14,6 +14,14 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Application user.
+ *
+ * Authentication (password, login, tokens) belongs to Keycloak; this table only
+ * stores application level profile data. The link to Keycloak is
+ * {@link #keycloakUserId} (the JWT "sub" claim), which is the stable identity --
+ * usernames and emails can change in Keycloak, the subject does not.
+ */
 @Entity
 @Table(name = "users")
 @Getter
@@ -21,22 +29,34 @@ import java.util.List;
 @NoArgsConstructor
 public class User {
 
+    // values allowed by the users.status check constraint
+    public static final String STATUS_ACTIVE = "ACTIVE";
+    public static final String STATUS_SUSPENDED = "SUSPENDED";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(name = "keycloak_user_id", nullable = false, unique = true, length = 255)
+    private String keycloakUserId;
+
     @Column(nullable = false, unique = true, length = 50)
     private String username;
 
-    @Column(nullable = false)
-    private String password;
-
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 255)
     private String email;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Role role; // ADMIN or USER
+    @Column(name = "full_name", length = 255)
+    private String fullName;
+
+    @Column(name = "avatar_url", length = 500)
+    private String avatarUrl;
+
+    @Column(nullable = false, length = 20)
+    private String status;
+
+    @Column(name = "last_login_at")
+    private LocalDateTime lastLoginAt;
 
     @Column(name = "created_at")
     @CreationTimestamp
@@ -66,3 +86,4 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews;
 }
+

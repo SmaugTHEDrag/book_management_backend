@@ -27,10 +27,10 @@ public class UserSpecification {
                 predicates.add(criteriaBuilder.like(root.get("email"), value));
             }
 
-            // search bu role
-            if(form.getRoleSearch() != null && !form.getRoleSearch().isEmpty()){
-                String value = "%" + form.getRoleSearch().toLowerCase() + "%";
-                predicates.add(criteriaBuilder.like(root.get("role"), value));
+            // search by status
+            if(form.getStatusSearch() != null && !form.getStatusSearch().isEmpty()){
+                String value = "%" + form.getStatusSearch().toLowerCase() + "%";
+                predicates.add(criteriaBuilder.like(root.get("status"), value));
             }
 
             // id range filter

@@ -10,10 +10,13 @@ public class BlogSecurity {
 
     private final IBlogRepository blogRepository;
 
-    // check if the given blog belongs to the current user
-    public boolean isOwner(int blogId, String username) {
+    // check if the given blog belongs to the current Keycloak user
+    public boolean isOwner(int blogId, String keycloakUserId) {
+        if (keycloakUserId == null) return false;
+
         return blogRepository.findById(blogId)
-                .map(blog -> blog.getUser().getUsername().equals(username))
+                .map(blog -> keycloakUserId.equals(blog.getUser().getKeycloakUserId()))
                 .orElse(false);
     }
 }
+

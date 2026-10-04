@@ -1,7 +1,6 @@
 package com.example.BookManagement.common.security;
 
 import com.example.BookManagement.blog.repository.IBlogCommentRepository;
-import com.example.BookManagement.user.repository.IUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -11,27 +10,26 @@ public class CommentSecurity {
 
     private final IBlogCommentRepository commentRepository;
 
-    private final IUserRepository userRepository;
-
     // comment owner or blog owner can delete the comment
-    public boolean canDelete(Integer commentId, String username) {
-        if (commentId == null || username == null) return false;
+    public boolean canDelete(Integer commentId, String keycloakUserId) {
+        if (commentId == null || keycloakUserId == null) return false;
 
         return commentRepository.findById(commentId)
                 .map(comment ->
-                        comment.getUser().getUsername().equals(username) || // Comment owner
-                                comment.getBlog().getUser().getUsername().equals(username) // Blog owner
+                        keycloakUserId.equals(comment.getUser().getKeycloakUserId()) || // Comment owner
+                                keycloakUserId.equals(comment.getBlog().getUser().getKeycloakUserId()) // Blog owner
                 )
                 .orElse(false);
     }
 
     // only comment owner can edit
-    public boolean canEdit(Integer commentId, String username) {
-        if (commentId == null || username == null) return false;
+    public boolean canEdit(Integer commentId, String keycloakUserId) {
+        if (commentId == null || keycloakUserId == null) return false;
 
         return commentRepository.findById(commentId)
-                .map(comment -> comment.getUser().getUsername().equals(username)) // Only comment owner
+                .map(comment -> keycloakUserId.equals(comment.getUser().getKeycloakUserId())) // Only comment owner
                 .orElse(false);
     }
 }
+
 

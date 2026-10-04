@@ -5,10 +5,11 @@ import com.example.BookManagement.blog.dto.BlogCommentRequestDTO;
 import com.example.BookManagement.blog.entity.Blog;
 import com.example.BookManagement.blog.entity.BlogComment;
 import com.example.BookManagement.user.entity.User;
+import com.example.BookManagement.common.exception.ResourceNotFoundException;
+import com.example.BookManagement.common.security.CurrentUserService;
 import com.example.BookManagement.blog.mapper.BlogCommentMapper;
 import com.example.BookManagement.blog.repository.IBlogCommentRepository;
 import com.example.BookManagement.blog.repository.IBlogRepository;
-import com.example.BookManagement.user.repository.IUserRepository;
 import com.example.BookManagement.ai.moderation.IAIModerationService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +29,7 @@ public class BlogCommentService implements IBlogCommentService {
 
     private final IBlogRepository blogRepository;
 
-    private final IUserRepository userRepository;
+    private final CurrentUserService currentUserService;
 
     private final BlogCommentMapper blogCommentMapper;
 
@@ -57,12 +58,11 @@ public class BlogCommentService implements IBlogCommentService {
 
     // add new comment or reply
     @Override
-    public BlogCommentDTO addComment(BlogCommentRequestDTO request, String username) {
+    public BlogCommentDTO addComment(BlogCommentRequestDTO request) {
         Blog blog = blogRepository.findById(request.getBlogId())
-                .orElseThrow(() -> new RuntimeException("Blog not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Blog not found"));
 
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = currentUserService.getCurrentUser();
 
         BlogComment comment = new BlogComment();
         comment.setBlog(blog);
@@ -77,7 +77,7 @@ public class BlogCommentService implements IBlogCommentService {
 
         if (request.getParentCommentId() != null) {
             BlogComment parent = commentRepository.findById(request.getParentCommentId())
-                    .orElseThrow(() -> new RuntimeException("Parent comment not found"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Parent comment not found"));
             comment.setParentComment(parent);
         }
 
@@ -87,9 +87,9 @@ public class BlogCommentService implements IBlogCommentService {
 
     // update content or image only
     @Override
-    public BlogCommentDTO updateComment(Integer commentId, BlogCommentRequestDTO request, String username) {
+    public BlogCommentDTO updateComment(Integer commentId, BlogCommentRequestDTO request) {
         BlogComment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new RuntimeException("Comment not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Comment not found"));
 
         if (request.getContent() != null && !request.getContent().isBlank()) {
             moderationService.checkComment(request.getContent(), "Comment contains inappropriate content");
@@ -105,11 +105,11 @@ public class BlogCommentService implements IBlogCommentService {
     }
 
 
-    // privilege before delete a comment
+    // privileges are checked with @PreAuthorize before this is called
     @Override
-    public void deleteComment(Integer commentId, String username) {
+    public void deleteComment(Integer commentId) {
         BlogComment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new RuntimeException("Comment not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Comment not found"));
         commentRepository.delete(comment);
     }
 
@@ -118,7 +118,7 @@ public class BlogCommentService implements IBlogCommentService {
     @Override
     public List<BlogCommentDTO> getCommentsByBlog(Integer blogId) {
         Blog blog = blogRepository.findById(blogId)
-                .orElseThrow(() -> new RuntimeException("Blog not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Blog not found"));
 
         return commentRepository.findAllByBlogAndParentCommentIsNull(blog)
                 .stream()
@@ -126,3 +126,4 @@ public class BlogCommentService implements IBlogCommentService {
                 .toList();
     }
 }
+

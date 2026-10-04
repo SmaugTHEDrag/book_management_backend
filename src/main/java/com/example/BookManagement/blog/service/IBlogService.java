@@ -12,14 +12,15 @@ public interface IBlogService {
 
     BlogDTO getBlogById(int id);
 
-    BlogDTO createBlog(BlogRequestDTO requestDTO, String username);
+    BlogDTO createBlog(BlogRequestDTO requestDTO);
 
-    // only blog owner can update
-    BlogDTO updateBlog(int id, BlogRequestDTO requestDTO, String username);
+    // only blog owner can update (enforced with @PreAuthorize in the controller)
+    BlogDTO updateBlog(int id, BlogRequestDTO requestDTO);
 
-    // blog owner and admin check before delete
-    void deleteBlog(int id, String username);
+    // blog owner and admin can delete (enforced with @PreAuthorize in the controller)
+    void deleteBlog(int id);
 
     // create blog and upload image if provided
-    BlogDTO createBlogWithUpload(String title, String content, MultipartFile image, String imageURL, String username);
+    BlogDTO createBlogWithUpload(String title, String content, MultipartFile image, String imageURL);
 }
+

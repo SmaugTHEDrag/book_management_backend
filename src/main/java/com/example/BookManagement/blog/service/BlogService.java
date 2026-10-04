@@ -9,7 +9,7 @@ import com.example.BookManagement.user.entity.User;
 import com.example.BookManagement.common.exception.ResourceNotFoundException;
 import com.example.BookManagement.blog.mapper.BlogMapper;
 import com.example.BookManagement.blog.repository.IBlogRepository;
-import com.example.BookManagement.user.repository.IUserRepository;
+import com.example.BookManagement.common.security.CurrentUserService;
 import com.example.BookManagement.ai.moderation.IAIModerationService;
 import com.example.BookManagement.ai.chatbox.service.FileUploadService;
 import jakarta.transaction.Transactional;
@@ -30,7 +30,7 @@ public class BlogService implements IBlogService{
 
     private final IBlogRepository blogRepository;
 
-    private final IUserRepository userRepository;
+    private final CurrentUserService currentUserService;
 
     private final BlogMapper blogMapper;
 
@@ -90,9 +90,8 @@ public class BlogService implements IBlogService{
     }
 
     @Override
-    public BlogDTO createBlog(BlogRequestDTO blogRequestDTO, String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+    public BlogDTO createBlog(BlogRequestDTO blogRequestDTO) {
+        User user = currentUserService.getCurrentUser();
 
         if (blogRequestDTO.getTitle() == null || blogRequestDTO.getTitle().isBlank()) {
             throw new IllegalArgumentException("Title is required");
@@ -114,7 +113,7 @@ public class BlogService implements IBlogService{
     }
 
     @Override
-    public BlogDTO updateBlog(int id, BlogRequestDTO blogRequestDTO, String username) {
+    public BlogDTO updateBlog(int id, BlogRequestDTO blogRequestDTO) {
         Blog blog = blogRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Blog not found"));
 
@@ -137,15 +136,15 @@ public class BlogService implements IBlogService{
     }
 
     @Override
-    public void deleteBlog(int id, String username) {
+    public void deleteBlog(int id) {
         Blog blog = blogRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Blog not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Blog not found"));
         blogRepository.delete(blog);
     }
 
     // Create a new blog post with image (Cloudinary)
     @Override
-    public BlogDTO createBlogWithUpload(String title, String content, MultipartFile image, String imageURL, String username) {
+    public BlogDTO createBlogWithUpload(String title, String content, MultipartFile image, String imageURL) {
         try {
             String uploadedImageUrl = null;
 
@@ -160,7 +159,7 @@ public class BlogService implements IBlogService{
             }
 
             BlogRequestDTO dto = new BlogRequestDTO(title, content, uploadedImageUrl);
-            return createBlog(dto, username);
+            return createBlog(dto);
         } catch (RuntimeException | IOException e) {
             throw new RuntimeException(e);
         }

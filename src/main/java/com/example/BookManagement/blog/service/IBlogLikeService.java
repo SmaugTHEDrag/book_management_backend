@@ -4,11 +4,12 @@ import com.example.BookManagement.blog.dto.BlogLikeDTO;
 
 public interface IBlogLikeService {
 
-    BlogLikeDTO likeBlog(Integer blogId, String username);
+    BlogLikeDTO likeBlog(Integer blogId);
 
-    void unlikeBlog(Integer blogId, String username);
+    void unlikeBlog(Integer blogId);
 
     long getLikeCount(Integer blogId);
 
-    boolean hasUserLiked(Integer blogId, String username);
+    boolean hasUserLiked(Integer blogId);
 }
+

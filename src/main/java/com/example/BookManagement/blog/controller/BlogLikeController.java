@@ -8,8 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
-
 @RestController
 @RequestMapping("/api/blogs")
 @Tag(name = "Blog Like API", description = "APIs for blog likes")
@@ -26,25 +24,23 @@ public class BlogLikeController {
 
     @Operation(summary = "Check user like")
     @GetMapping("/{blogId}/likes/has")
-    public ResponseEntity<Boolean> hasUserLiked(@PathVariable Integer blogId, Principal principal) {
-        String username = principal.getName();
-        return ResponseEntity.ok(likeService.hasUserLiked(blogId, username));
+    public ResponseEntity<Boolean> hasUserLiked(@PathVariable Integer blogId) {
+        return ResponseEntity.ok(likeService.hasUserLiked(blogId));
     }
 
     @Operation(summary = "Like a blog")
     @PostMapping("/{blogId}/likes")
-    public ResponseEntity<BlogLikeDTO> likeBlog(@PathVariable Integer blogId, Principal principal) {
-        String username = principal.getName();
-        BlogLikeDTO dto = likeService.likeBlog(blogId, username);
+    public ResponseEntity<BlogLikeDTO> likeBlog(@PathVariable Integer blogId) {
+        BlogLikeDTO dto = likeService.likeBlog(blogId);
         return ResponseEntity.ok(dto);
     }
 
     @Operation(summary = "Unlike a blog")
     @DeleteMapping("/{blogId}/likes")
-    public ResponseEntity<Void> unlikeBlog(@PathVariable Integer blogId, Principal principal) {
-        String username = principal.getName();
-        likeService.unlikeBlog(blogId, username);
+    public ResponseEntity<Void> unlikeBlog(@PathVariable Integer blogId) {
+        likeService.unlikeBlog(blogId);
         return ResponseEntity.noContent().build();
     }
 
 }
+

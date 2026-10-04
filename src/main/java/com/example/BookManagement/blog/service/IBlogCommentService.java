@@ -10,12 +10,13 @@ public interface IBlogCommentService {
     List<BlogCommentDTO> getCommentsByBlog(Integer blogId);
 
     // add new comment or reply
-    BlogCommentDTO addComment(BlogCommentRequestDTO request, String username);
+    BlogCommentDTO addComment(BlogCommentRequestDTO request);
 
-    // only comment owner can update
-    BlogCommentDTO updateComment(Integer commentId, BlogCommentRequestDTO request, String username);
+    // only comment owner can update (enforced with @PreAuthorize in the controller)
+    BlogCommentDTO updateComment(Integer commentId, BlogCommentRequestDTO request);
 
-    // privilege check is required before delete
-    void deleteComment(Integer commentId, String username);
+    // comment owner, blog owner or admin can delete (enforced with @PreAuthorize in the controller)
+    void deleteComment(Integer commentId);
 
 }
+

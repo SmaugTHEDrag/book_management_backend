@@ -1,27 +1,27 @@
 services:
 
   # ============================================================
-  # PostgreSQL - ReadFlow Application
+  # PostgreSQL - BukiMind Application
   # ============================================================
   postgres:
     image: postgres:17
-    container_name: readflow-postgres
+    container_name: bukimind-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-book_management}
-      POSTGRES_USER: ${POSTGRES_USER:-bookmanagement}
+      POSTGRES_DB: ${POSTGRES_DB:-bukimind}
+      POSTGRES_USER: ${POSTGRES_USER:-bukimind}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
     ports:
       - "${POSTGRES_HOST_PORT:-5433}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - readflow-network
+      - bukimind-network
     healthcheck:
       test:
         [
           "CMD-SHELL",
-          "pg_isready -U ${POSTGRES_USER:-bookmanagement} -d ${POSTGRES_DB:-book_management}"
+          "pg_isready -U ${POSTGRES_USER:-bukimind} -d ${POSTGRES_DB:-bukimind}"
         ]
       interval: 10s
       timeout: 5s
@@ -34,7 +34,7 @@ services:
   # ============================================================
   keycloak-postgres:
     image: postgres:17
-    container_name: readflow-keycloak-postgres
+    container_name: bukimind-keycloak-postgres
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${KEYCLOAK_DB:-keycloak}
@@ -45,7 +45,7 @@ services:
     volumes:
       - keycloak_postgres_data:/var/lib/postgresql/data
     networks:
-      - readflow-network
+      - bukimind-network
     healthcheck:
       test:
         [
@@ -63,7 +63,7 @@ services:
   # ============================================================
   redis:
     image: redis:8-alpine
-    container_name: readflow-redis
+    container_name: bukimind-redis
     restart: unless-stopped
     ports:
       - "${REDIS_HOST_PORT:-6379}:6379"
@@ -76,7 +76,7 @@ services:
     volumes:
       - redis_data:/data
     networks:
-      - readflow-network
+      - bukimind-network
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -90,7 +90,7 @@ services:
   # ============================================================
   redisinsight:
     image: redis/redisinsight:latest
-    container_name: readflow-redisinsight
+    container_name: bukimind-redisinsight
     restart: unless-stopped
     ports:
       - "${REDISINSIGHT_HOST_PORT:-5540}:5540"
@@ -100,7 +100,7 @@ services:
       redis:
         condition: service_healthy
     networks:
-      - readflow-network
+      - bukimind-network
     profiles:
       - dev
 
@@ -110,7 +110,7 @@ services:
   # ============================================================
   keycloak:
     image: quay.io/keycloak/keycloak:latest
-    container_name: readflow-keycloak
+    container_name: bukimind-keycloak
     restart: unless-stopped
     command:
       - start-dev
@@ -128,7 +128,7 @@ services:
       keycloak-postgres:
         condition: service_healthy
     networks:
-      - readflow-network
+      - bukimind-network
 
 
 # ==============================================================
@@ -136,22 +136,22 @@ services:
 # ==============================================================
 volumes:
   postgres_data:
-    name: readflow_postgres_data
+    name: bukimind_postgres_data
 
   keycloak_postgres_data:
-    name: readflow_keycloak_postgres_data
+    name: bukimind_keycloak_postgres_data
 
   redis_data:
-    name: readflow_redis_data
+    name: bukimind_redis_data
 
   redisinsight_data:
-    name: readflow_redisinsight_data
+    name: bukimind_redisinsight_data
 
 
 # ==============================================================
 # Network
 # ==============================================================
 networks:
-  readflow-network:
-    name: readflow-network
+  bukimind-network:
+    name: bukimind-network
     driver: bridge

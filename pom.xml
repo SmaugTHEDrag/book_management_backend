@@ -8,11 +8,11 @@
 		<version>3.2.5</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.example</groupId>
-	<artifactId>BookManagement</artifactId>
+	<groupId>com.bukimind</groupId>
+	<artifactId>bukimind-backend</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>BookManagement</name>
-	<description>Book Management project with Spring Boot</description>
+	<name>BukiMind Backend</name>
+	<description>BukiMind project with Spring Boot</description>
 	<url/>
 	<licenses>
 		<license/>

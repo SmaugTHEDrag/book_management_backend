@@ -7,15 +7,16 @@ import java.util.List;
 
 public interface IReviewService {
 
-    ReviewDTO createReview(String username, ReviewRequestDTO request);
+    ReviewDTO createReview(ReviewRequestDTO request);
 
-    // only review owner is allowed to update
-    ReviewDTO updateReview(Integer id, String username, ReviewRequestDTO request);
+    // only review owner is allowed to update (enforced with @PreAuthorize in the controller)
+    ReviewDTO updateReview(Integer id, ReviewRequestDTO request);
 
-    // only review owner is allowed to delete
-    void deleteReview(Integer id, String username);
+    // only review owner is allowed to delete (enforced with @PreAuthorize in the controller)
+    void deleteReview(Integer id);
 
     List<ReviewDTO> getReviewsByBook(Integer bookId);
 
     List<ReviewDTO> getReviewsByUser(String username);
 }
+

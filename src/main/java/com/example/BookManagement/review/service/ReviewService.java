@@ -6,13 +6,13 @@ import com.example.BookManagement.book.entity.Book;
 import com.example.BookManagement.review.entity.Review;
 import com.example.BookManagement.user.entity.User;
 import com.example.BookManagement.common.exception.ResourceNotFoundException;
+import com.example.BookManagement.common.security.CurrentUserService;
 import com.example.BookManagement.review.mapper.ReviewMapper;
 import com.example.BookManagement.book.repository.IBookRepository;
 import com.example.BookManagement.review.repository.IReviewRepository;
 import com.example.BookManagement.user.repository.IUserRepository;
 import com.example.BookManagement.ai.moderation.IAIModerationService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,12 +31,15 @@ public class ReviewService implements IReviewService{
 
     private final IAIModerationService moderationService;
 
+    private final CurrentUserService currentUserService;
+
     @Override
     public List<ReviewDTO> getReviewsByBook(Integer bookId) {
         List<Review> reviews = reviewRepository.findByBookId(bookId);
         return reviewMapper.toListDTO(reviews);
     }
 
+    // public profile lookup: username is the display key here, not the identity
     @Override
     public List<ReviewDTO> getReviewsByUser(String username) {
         User user = userRepository.findByUsername(username)
@@ -46,16 +49,15 @@ public class ReviewService implements IReviewService{
     }
 
     @Override
-    public ReviewDTO createReview(String username, ReviewRequestDTO request) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(()-> new UsernameNotFoundException("username not found"));
+    public ReviewDTO createReview(ReviewRequestDTO request) {
+        User user = currentUserService.getCurrentUser();
 
         Book book = bookRepository.findById(request.getBookId())
                 .orElseThrow(()-> new ResourceNotFoundException("Book not found"));
 
         // one user can only review a book once
         if(reviewRepository.existsByUserIdAndBookId(user.getId(), book.getId())){
-            throw new IllegalStateException("You already reviewed this book");
+            throw new IllegalArgumentException("You already reviewed this book");
         }
 
         // check toxic content using external moderation
@@ -71,15 +73,11 @@ public class ReviewService implements IReviewService{
         return reviewMapper.toDTO(savedReview);
     }
 
+    // ownership is enforced with @PreAuthorize in the controller
     @Override
-    public ReviewDTO updateReview(Integer id, String username, ReviewRequestDTO request) {
+    public ReviewDTO updateReview(Integer id, ReviewRequestDTO request) {
         Review review = reviewRepository.findById(id)
                 .orElseThrow(()-> new ResourceNotFoundException("Review not found"));
-
-        // only review owner can update
-        if (!review.getUser().getUsername().equals(username)) {
-            throw new IllegalStateException("You are not allowed to update this review");
-        }
 
         if(request.getRating() != null && (request.getRating()) != 0){
             review.setRating(request.getRating());
@@ -95,17 +93,14 @@ public class ReviewService implements IReviewService{
         return reviewMapper.toDTO(updatedReview);
     }
 
+    // ownership is enforced with @PreAuthorize in the controller
     @Override
-    public void deleteReview(Integer id, String username) {
+    public void deleteReview(Integer id) {
         Review review = reviewRepository.findById(id)
                 .orElseThrow(()->new ResourceNotFoundException("Review not found"));
-
-        // Only review owner can delete
-        if (!review.getUser().getUsername().equals(username)) {
-            throw new IllegalStateException("You are not allowed to delete this review");
-        }
 
         reviewRepository.delete(review);
     }
 
 }
+

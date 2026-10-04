@@ -40,7 +40,7 @@ public class BookController {
     }
 
     @Operation(summary = "Create book", description = " Only admin create a new book")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<BookDTO> createBook(@RequestBody @Valid BookRequestDTO bookRequestDTO){
         BookDTO createBookDTO = bookService.createBook(bookRequestDTO);
@@ -48,7 +48,7 @@ public class BookController {
     }
 
     @Operation(summary = "Upload book with files", description = "Only admin create book with upload")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(value = "/upload", consumes = {"multipart/form-data"})
     public ResponseEntity<BookDTO> createBookWithUpload(
             // Text fields sent via multipart/form-data
@@ -65,7 +65,7 @@ public class BookController {
     }
 
     @Operation(summary = "Update book", description = "Only admin can update book")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("{id}")
     public ResponseEntity<BookDTO> updateBook(@PathVariable int id, @RequestBody @Valid BookRequestDTO bookRequestDTO){
         BookDTO updateBookDTO = bookService.updateBook(id, bookRequestDTO);
@@ -73,7 +73,7 @@ public class BookController {
     }
 
     @Operation(summary = "Delete book", description = "Only admin delete book")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("{id}")
     public ResponseEntity<Object> deleteBook(@PathVariable int id){
         bookService.deleteBook(id);

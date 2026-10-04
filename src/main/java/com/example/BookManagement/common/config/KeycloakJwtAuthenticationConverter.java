@@ -6,45 +6,47 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
+/**
+ * Maps a Keycloak access token to a Spring Security authentication.
+ *
+ * - authorities come from realm_access.roles and are prefixed with ROLE_,
+ *   so Keycloak role "ADMIN" is checked with hasRole('ADMIN') / ROLE_ADMIN
+ * - the principal name is the token subject ("sub"), which is the stable
+ *   Keycloak user id the application stores as users.keycloak_user_id
+ */
 @Component
 public class KeycloakJwtAuthenticationConverter implements Converter<Jwt, AbstractAuthenticationToken> {
 
-    private final JwtGrantedAuthoritiesConverter defaultConverter = new JwtGrantedAuthoritiesConverter();
+    private static final String REALM_ACCESS_CLAIM = "realm_access";
+    private static final String ROLES_CLAIM = "roles";
+    private static final String ROLE_PREFIX = "ROLE_";
+
+    // Keycloak's auto-generated composite role, not an application role
+    private static final String DEFAULT_ROLE_PREFIX = "default-roles-";
 
     @Override
     public AbstractAuthenticationToken convert(Jwt jwt) {
-        Collection<GrantedAuthority> authorities = Stream.concat(
-                defaultConverter.convert(jwt).stream(),
-                extractRealmRoles(jwt).stream()
-        ).collect(Collectors.toSet());
-
-        String principalName = jwt.hasClaim("preferred_username")
-                ? jwt.getClaimAsString("preferred_username")
-                : jwt.getSubject();
-
-        return new JwtAuthenticationToken(jwt, authorities, principalName);
+        return new JwtAuthenticationToken(jwt, extractRealmRoles(jwt), jwt.getSubject());
     }
 
-    @SuppressWarnings("unchecked")
     private Collection<GrantedAuthority> extractRealmRoles(Jwt jwt) {
-        Map<String, Object> realmAccess = jwt.getClaim("realm_access");
-        if (realmAccess == null || !realmAccess.containsKey("roles")) {
-            return Collections.emptyList();
+        Map<String, Object> realmAccess = jwt.getClaim(REALM_ACCESS_CLAIM);
+        if (realmAccess == null || !(realmAccess.get(ROLES_CLAIM) instanceof Collection<?> roles)) {
+            return List.of();
         }
 
-        List<String> roles = (List<String>) realmAccess.get("roles");
         return roles.stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.toUpperCase()))
-                .collect(Collectors.toList());
+                .map(String::valueOf)
+                .filter(role -> !role.startsWith(DEFAULT_ROLE_PREFIX))
+                .map(role -> (GrantedAuthority) new SimpleGrantedAuthority(ROLE_PREFIX + role.toUpperCase(Locale.ROOT)))
+                .collect(Collectors.toSet());
     }
 }

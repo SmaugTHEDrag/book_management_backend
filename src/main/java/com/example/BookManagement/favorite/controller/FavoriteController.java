@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -23,21 +22,22 @@ public class FavoriteController {
 
     @Operation(summary = "Get all favorite books of the current user")
     @GetMapping
-    public ResponseEntity<List<FavoriteDTO>> getFavorites(Principal principal) {
-        return ResponseEntity.ok(favoriteService.getAllFavorites(principal.getName()));
+    public ResponseEntity<List<FavoriteDTO>> getFavorites() {
+        return ResponseEntity.ok(favoriteService.getAllFavorites());
     }
 
     @Operation(summary = "Add favorite to current user's favorites")
     @PostMapping
-    public ResponseEntity<FavoriteDTO> addFavorite(@RequestBody @Valid FavoriteRequestDTO request, Principal principal) {
-        return ResponseEntity.ok(favoriteService.addFavorite(request, principal.getName()));
+    public ResponseEntity<FavoriteDTO> addFavorite(@RequestBody @Valid FavoriteRequestDTO request) {
+        return ResponseEntity.ok(favoriteService.addFavorite(request));
     }
 
     @Operation(summary = "Remove favorite from current user's favorites")
     @DeleteMapping("/{bookId}")
-    public ResponseEntity<?> removeFavorite(@PathVariable Integer bookId, Principal principal) {
-        favoriteService.removeFavorite(bookId, principal.getName());
+    public ResponseEntity<?> removeFavorite(@PathVariable Integer bookId) {
+        favoriteService.removeFavorite(bookId);
         return ResponseEntity.ok("Book removed from favorites");
     }
 
 }
+

@@ -6,14 +6,13 @@ import com.example.BookManagement.book.entity.Book;
 import com.example.BookManagement.favorite.entity.Favorite;
 import com.example.BookManagement.user.entity.User;
 import com.example.BookManagement.common.exception.ResourceNotFoundException;
+import com.example.BookManagement.common.security.CurrentUserService;
 import com.example.BookManagement.favorite.mapper.FavoriteMapper;
 import com.example.BookManagement.book.repository.IBookRepository;
 import com.example.BookManagement.favorite.repository.IFavoriteRepository;
-import com.example.BookManagement.user.repository.IUserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,16 +25,15 @@ public class FavoriteService implements IFavoriteService{
 
     private final IFavoriteRepository favoriteRepository;
 
-    private final IUserRepository userRepository;
-
     private final IBookRepository bookRepository;
 
     private final FavoriteMapper favoriteMapper;
 
+    private final CurrentUserService currentUserService;
+
     @Override
-    public List<FavoriteDTO> getAllFavorites(String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    public List<FavoriteDTO> getAllFavorites() {
+        User user = currentUserService.getCurrentUser();
 
         List<Favorite> favorites = favoriteRepository.findByUserId(user.getId());
 
@@ -44,10 +42,9 @@ public class FavoriteService implements IFavoriteService{
 
     // Adds a book to the user's favorites.
     @Override
-    public FavoriteDTO addFavorite(FavoriteRequestDTO request, String username) {
+    public FavoriteDTO addFavorite(FavoriteRequestDTO request) {
 
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        User user = currentUserService.getCurrentUser();
 
         Book book = bookRepository.findById(request.getBookId())
                 .orElseThrow(() -> new ResourceNotFoundException("Book not found"));
@@ -65,12 +62,9 @@ public class FavoriteService implements IFavoriteService{
     }
 
     @Override
-    public void removeFavorite(Integer bookId, String username) {
+    public void removeFavorite(Integer bookId) {
 
-        User user = userRepository.findByUsername(username)
-                .stream()
-                .findFirst()
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        User user = currentUserService.getCurrentUser();
 
         Favorite favorite = favoriteRepository.findByUserIdAndBookId(user.getId(), bookId)
                 .orElseThrow(() -> new ResourceNotFoundException("Favorite not found"));
@@ -78,3 +72,4 @@ public class FavoriteService implements IFavoriteService{
         favoriteRepository.delete(favorite);
     }
 }
+

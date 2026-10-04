@@ -7,11 +7,12 @@ import java.util.List;
 
 public interface IFavoriteService {
 
-    List<FavoriteDTO> getAllFavorites(String username);
+    List<FavoriteDTO> getAllFavorites();
 
     // one user can favorite a book only once
-    FavoriteDTO addFavorite(FavoriteRequestDTO favoriteRequestDTO, String username);
+    FavoriteDTO addFavorite(FavoriteRequestDTO favoriteRequestDTO);
 
-    void removeFavorite(Integer bookId, String username);
+    void removeFavorite(Integer bookId);
 
 }
+
